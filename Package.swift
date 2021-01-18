@@ -24,7 +24,7 @@ let package = Package(
     products: [
         .library(
             name: "TrackerRadarKit",
-            targets: ["TrackerRadarKit"]),
+            targets: ["TrackerRadarKit"])
     ],
     dependencies: [],
     targets: [
@@ -33,6 +33,6 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "TrackerRadarKitTests",
-            dependencies: ["TrackerRadarKit"]),
+            dependencies: ["TrackerRadarKit"])
     ]
 )

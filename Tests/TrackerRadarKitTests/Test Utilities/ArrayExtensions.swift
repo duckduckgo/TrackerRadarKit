@@ -1,6 +1,6 @@
-// swift-tools-version:5.3
 //
-//  TrackerBlockerKit
+//  ArrayExtensions.swift
+//  TrackerRadarKit
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -17,25 +17,23 @@
 //  limitations under the License.
 //
 
-import PackageDescription
+import Foundation
+@testable import TrackerRadarKit
 
-let package = Package(
-    name: "TrackerRadarKit",
-    products: [
-        .library(
-            name: "TrackerRadarKit",
-            targets: ["TrackerRadarKit"])
-    ],
-    dependencies: [],
-    targets: [
-        .target(
-            name: "TrackerRadarKit",
-            dependencies: []),
-        .testTarget(
-            name: "TrackerRadarKitTests",
-            dependencies: ["TrackerRadarKit"],
-            resources: [
-                .process("Resources/trackerData.json")
-            ])
-    ]
-)
+extension Array where Element == ContentBlockerRule {
+    func findExactFilter(filter: String) -> ContentBlockerRule? {
+        self.first { $0.trigger.urlFilter == filter }
+    }
+
+    func findInIfDomain(domain: String) -> ContentBlockerRule? {
+        for rule in self {
+            if let ifDomain = rule.trigger.ifDomain {
+                for url in ifDomain where url == domain {
+                    return rule
+                }
+            }
+        }
+
+        return nil
+    }
+}

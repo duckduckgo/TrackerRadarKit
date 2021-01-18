@@ -1,6 +1,6 @@
 //
 //  TrackerData.swift
-//  ContentBlocker
+//  TrackerBlockerKit
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //

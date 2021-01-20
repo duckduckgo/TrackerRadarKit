@@ -1,6 +1,5 @@
 //
 //  ArrayExtensions.swift
-//  TrackerRadarKit
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //

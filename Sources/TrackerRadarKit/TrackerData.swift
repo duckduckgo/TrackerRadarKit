@@ -149,9 +149,15 @@ extension KnownTracker {
 }
 
 public struct Entity: Codable, Hashable {
-    
+
     public let displayName: String?
     public let domains: [String]?
     public let prevalence: Double?
+
+    public init(displayName: String?, domains: [String]?, prevalence: Double?) {
+        self.displayName = displayName
+        self.domains = domains
+        self.prevalence = prevalence
+    }
     
 }

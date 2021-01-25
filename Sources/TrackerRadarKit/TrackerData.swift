@@ -35,7 +35,10 @@ public struct TrackerData: Codable, Equatable {
     public let domains: [TrackerDomain: EntityName]
     public let cnames: [CnameDomain: TrackerDomain]?
     
-    public init(trackers: [String: KnownTracker], entities: [String: Entity], domains: [String: String], cnames: [String: String]?) {
+    public init(trackers: [String: KnownTracker],
+                entities: [String: Entity],
+                domains: [String: String],
+                cnames: [String: String]?) {
         self.trackers = trackers
         self.entities = entities
         self.domains = domains
@@ -94,6 +97,11 @@ public struct KnownTracker: Codable, Equatable {
             public let domains: [String]?
             public let types: [String]?
 
+            public init(domains: [String]?, types: [String]?) {
+                self.domains = domains
+                self.types = types
+            }
+
         }
         // swiftlint:enable nesting
 
@@ -102,7 +110,18 @@ public struct KnownTracker: Codable, Equatable {
         public let action: ActionType?
         public let options: Matching?
         public let exceptions: Matching?
-        
+
+        public init(rule: String?,
+                    surrogate: String?,
+                    action: KnownTracker.ActionType?,
+                    options: KnownTracker.Rule.Matching?,
+                    exceptions: KnownTracker.Rule.Matching?) {
+            self.rule = rule
+            self.surrogate = surrogate
+            self.action = action
+            self.options = options
+            self.exceptions = exceptions
+        }
     }
     
     public enum ActionType: String, Codable {
@@ -139,7 +158,13 @@ public struct KnownTracker: Codable, Equatable {
         return newTracker
     }
 
-    public init(domain: String?, defaultAction: KnownTracker.ActionType?, owner: KnownTracker.Owner?, prevalence: Double?, subdomains: [String]?, categories: [String]?, rules: [KnownTracker.Rule]?) {
+    public init(domain: String?,
+                defaultAction: KnownTracker.ActionType?,
+                owner: KnownTracker.Owner?,
+                prevalence: Double?,
+                subdomains: [String]?,
+                categories: [String]?,
+                rules: [KnownTracker.Rule]?) {
         self.domain = domain
         self.defaultAction = defaultAction
         self.owner = owner

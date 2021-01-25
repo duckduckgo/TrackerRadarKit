@@ -139,6 +139,16 @@ public struct KnownTracker: Codable, Equatable {
         return newTracker
     }
 
+    public init(domain: String?, defaultAction: KnownTracker.ActionType?, owner: KnownTracker.Owner?, prevalence: Double?, subdomains: [String]?, categories: [String]?, rules: [KnownTracker.Rule]?) {
+        self.domain = domain
+        self.defaultAction = defaultAction
+        self.owner = owner
+        self.prevalence = prevalence
+        self.subdomains = subdomains
+        self.categories = categories
+        self.rules = rules
+    }
+
 }
 
 extension KnownTracker {

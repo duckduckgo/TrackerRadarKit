@@ -78,6 +78,11 @@ public struct KnownTracker: Codable, Equatable {
         
         public let name: String?
         public let displayName: String?
+
+        public init(name: String?, displayName: String?) {
+            self.name = name
+            self.displayName = displayName
+        }
     
     }
     

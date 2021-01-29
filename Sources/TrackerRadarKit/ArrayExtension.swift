@@ -37,10 +37,6 @@ extension Array where Element == String {
         return prefixAll(with: "*")
     }
 
-    func normalizeAsUrls() -> [String] {
-        return map { ContentBlockerRulesBuilder.Constants.subDomainPrefix + $0 + "/.*" }
-    }
-
     func mapResources() -> [ContentBlockerRule.Trigger.ResourceType] {
         return compactMap { ContentBlockerRulesBuilder.resourceMapping[$0] }
     }

@@ -58,9 +58,26 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
             andTemporaryUnprotectedDomains: []
         ).map { $0.trigger.urlFilter }
 
-        // Temporary quick checks to see if these are differences, limited to 50 because these tests are failing even on this limited subset.
-        XCTAssertEqual(firstGeneration.prefix(upTo: 50), secondGeneration.prefix(upTo: 50))
-        XCTAssertEqual(firstGeneration.suffix(50), secondGeneration.suffix(50))
+        // The data set is large enough that comparing these is slow, so check batches at the start and end.
+        XCTAssertEqual(firstGeneration.prefix(upTo: 1000), secondGeneration.prefix(upTo: 1000))
+        XCTAssertEqual(firstGeneration.suffix(1000), secondGeneration.suffix(1000))
+    }
+
+    func testLoadingRulesIsDeterministic_MockData() {
+        let data = JSONTestDataLoader.mockTrackerData
+        let mockData = try! JSONDecoder().decode(TrackerData.self, from: data)
+
+        let firstGeneration = ContentBlockerRulesBuilder(trackerData: mockData).buildRules(
+            withExceptions: [],
+            andTemporaryUnprotectedDomains: []
+        ).map { $0.trigger.urlFilter }
+
+        let secondGeneration = ContentBlockerRulesBuilder(trackerData: mockData).buildRules(
+            withExceptions: [],
+            andTemporaryUnprotectedDomains: []
+        ).map { $0.trigger.urlFilter }
+
+        XCTAssertEqual(firstGeneration, secondGeneration)
     }
 
 }

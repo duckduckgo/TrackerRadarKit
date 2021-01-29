@@ -48,16 +48,18 @@ public struct ContentBlockerRulesBuilder {
             buildRules(from: $0)
         }.flatMap { $0 }
         
-        var cnameTrackers = [String: KnownTracker]()
+        var cnameTrackers: [(String, KnownTracker)] = []
+
         trackerData.cnames?.forEach { key, value in
             guard let knownTracker = trackerData.findTracker(byCname: value) else { return }
             let newTracker = knownTracker.copy(withNewDomain: key)
-            cnameTrackers[key] = newTracker
+            cnameTrackers.append((key, newTracker))
         }
-        let cnameRules = cnameTrackers.values.compactMap {
-            buildRules(from: $0)
+
+        let cnameRules = cnameTrackers.map {
+            buildRules(from: $1)
         }.flatMap { $0 }
-        
+
         return trackerRules + cnameRules + buildExceptions(from: exceptions, andUnprotectedDomains: tempUnprotectedDomains)
     }
     

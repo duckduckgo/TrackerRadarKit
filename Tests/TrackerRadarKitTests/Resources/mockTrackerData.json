@@ -60,11 +60,6 @@
                     "rule": "tracker-2\\.com\\/tracking\\/tracker2\\.js",
                     "fingerprinting": 1,
                     "cookies": 0.01
-                },
-                {
-                    "rule": "tracker-2\\.com\\/tracking\\/tracker3\\.js",
-                    "fingerprinting": 1,
-                    "cookies": 0.01
                 }
             ]
         },
@@ -91,25 +86,7 @@
                     "cookies": 0.01
                 }
             ]
-        },
-        "tracker-a.com": {
-            "domain": "tracker-a.com",
-            "owner": {
-                "name": "Tracker A, Inc.",
-                "displayName": "Tracker A"
-            },
-            "prevalence": 1,
-            "fingerprinting": 1,
-            "cookies": 1,
-            "categories": [
-                "Ad Motivated Tracking",
-                "Advertising",
-                "Analytics",
-                "Third-Party Analytics Marketing"
-            ],
-            "default": "block",
-            "rules": []
-        },
+        }
     },
     "entities": {
         "Tracker 1, Inc.": {
@@ -132,20 +109,12 @@
             ],
             "prevalence": 1,
             "displayName": "Tracker 3"
-        },
-        "Tracker A, Inc.": {
-            "domains": [
-                "tracker-a.com"
-            ],
-            "prevalence": 1,
-            "displayName": "Tracker A"
         }
     },
     "domains": {
         "tracker-1.com": "Tracker 1",
         "tracker-2.com": "Tracker 2",
-        "tracker-3.com": "Tracker 3",
-        "tracker-a.com": "Tracker A"
+        "tracker-3.com": "Tracker 3"
     },
     "cnames": {
         "tracker-1.com": "cname.tracker-1.com",

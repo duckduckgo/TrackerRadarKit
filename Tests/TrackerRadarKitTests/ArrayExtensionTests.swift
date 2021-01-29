@@ -37,4 +37,33 @@ class ArrayExtensionTests: XCTestCase {
         XCTAssertEqual(deduplicated, Array(1...100))
     }
 
+    func testPrefixAll() {
+        let strings = ["World"]
+        let prefixed = strings.prefixAll(with: "👋 Hello ")
+
+        XCTAssertEqual(prefixed, ["👋 Hello World"])
+    }
+
+    func testWildcards() {
+        let strings = ["a", "b", "c"]
+        let wildcards = strings.wildcards()
+
+        XCTAssertEqual(wildcards, ["*a", "*b", "*c"])
+    }
+
+    func testMapResources() {
+        let resources = [
+            "script",
+            "xmlhttprequest",
+            "subdocument",
+            "image",
+            "stylesheet",
+            "invalid-resource-type"
+        ]
+
+        let mapped = resources.mapResources()
+
+        XCTAssertEqual(mapped, [.script, .raw, .document, .image, .stylesheet])
+    }
+
 }

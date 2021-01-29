@@ -194,34 +194,6 @@ fileprivate extension String {
     
 }
 
-fileprivate extension Array where Element: Hashable {
-    
-    func removeDuplicates() -> [Element] {
-        return Array(Set(self))
-    }
-    
-}
-
-fileprivate extension Array where Element == String {
-    
-    func prefixAll(with prefix: String) -> [String] {
-        return map { prefix + $0 }
-    }
-    
-    func wildcards() -> [String] {
-        return prefixAll(with: "*")
-    }
-    
-    func normalizeAsUrls() -> [String] {
-        return map { ContentBlockerRulesBuilder.Constants.subDomainPrefix + $0 + "/.*" }
-    }
-    
-    func mapResources() -> [ContentBlockerRule.Trigger.ResourceType] {
-        return compactMap { ContentBlockerRulesBuilder.resourceMapping[$0] }
-    }
-    
-}
-
 fileprivate extension KnownTracker.Rule {
     
     func normalizedRule() -> String {

@@ -21,10 +21,14 @@ import XCTest
 
 class ContentBlockerRulesBuilderTests: XCTestCase {
 
-    func testLoadingRules() throws {
+    // swiftlint:disable force_try
+    lazy var trackerData: TrackerData = {
         let data = JSONTestDataLoader.trackerData
-        let trackerData = try JSONDecoder().decode(TrackerData.self, from: data)
+        return try! JSONDecoder().decode(TrackerData.self, from: data)
+    }()
+    // swiftlint:enable force_try
 
+    func testLoadingRules() throws {
         let rules = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(withExceptions: ["duckduckgo.com"],
         andTemporaryUnprotectedDomains: [])
 
@@ -41,6 +45,22 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         } else {
             XCTFail("Missing domain exception")
         }
+    }
+
+    func testLoadingRulesIsDeterministic() {
+        let firstGeneration = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(
+            withExceptions: [],
+            andTemporaryUnprotectedDomains: []
+        ).map { $0.trigger.urlFilter }
+
+        let secondGeneration = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(
+            withExceptions: [],
+            andTemporaryUnprotectedDomains: []
+        ).map { $0.trigger.urlFilter }
+
+        // Temporary quick checks to see if these are differences, limited to 50 because these tests are failing even on this limited subset.
+        XCTAssertEqual(firstGeneration.prefix(upTo: 50), secondGeneration.prefix(upTo: 50))
+        XCTAssertEqual(firstGeneration.suffix(50), secondGeneration.suffix(50))
     }
 
 }

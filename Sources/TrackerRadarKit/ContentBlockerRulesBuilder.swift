@@ -48,16 +48,16 @@ public struct ContentBlockerRulesBuilder {
             buildRules(from: $0)
         }.flatMap { $0 }
         
-        var cnameTrackers = [String: KnownTracker]()
+        var cnameTrackers = [KnownTracker]()
+
         trackerData.cnames?.forEach { key, value in
             guard let knownTracker = trackerData.findTracker(byCname: value) else { return }
             let newTracker = knownTracker.copy(withNewDomain: key)
-            cnameTrackers[key] = newTracker
+            cnameTrackers.append(newTracker)
         }
-        let cnameRules = cnameTrackers.values.compactMap {
-            buildRules(from: $0)
-        }.flatMap { $0 }
-        
+
+        let cnameRules = cnameTrackers.map(buildRules(from:)).flatMap { $0 }
+
         return trackerRules + cnameRules + buildExceptions(from: exceptions, andUnprotectedDomains: tempUnprotectedDomains)
     }
     
@@ -190,34 +190,6 @@ fileprivate extension String {
     func regexEscape() -> String {
         return replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: ".", with: "\\.")
-    }
-    
-}
-
-fileprivate extension Array where Element: Hashable {
-    
-    func removeDuplicates() -> [Element] {
-        return Array(Set(self))
-    }
-    
-}
-
-fileprivate extension Array where Element == String {
-    
-    func prefixAll(with prefix: String) -> [String] {
-        return map { prefix + $0 }
-    }
-    
-    func wildcards() -> [String] {
-        return prefixAll(with: "*")
-    }
-    
-    func normalizeAsUrls() -> [String] {
-        return map { ContentBlockerRulesBuilder.Constants.subDomainPrefix + $0 + "/.*" }
-    }
-    
-    func mapResources() -> [ContentBlockerRule.Trigger.ResourceType] {
-        return compactMap { ContentBlockerRulesBuilder.resourceMapping[$0] }
     }
     
 }

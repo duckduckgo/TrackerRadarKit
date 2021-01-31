@@ -35,7 +35,8 @@ let package = Package(
             name: "TrackerRadarKitTests",
             dependencies: ["TrackerRadarKit"],
             resources: [
-                .process("Resources/trackerData.json")
+                .process("Resources/trackerData.json"),
+                .process("Resources/mockTrackerData.json")
             ])
     ]
 )

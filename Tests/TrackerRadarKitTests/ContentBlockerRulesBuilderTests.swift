@@ -21,10 +21,14 @@ import XCTest
 
 class ContentBlockerRulesBuilderTests: XCTestCase {
 
-    func testLoadingRules() throws {
+    // swiftlint:disable force_try
+    lazy var trackerData: TrackerData = {
         let data = JSONTestDataLoader.trackerData
-        let trackerData = try JSONDecoder().decode(TrackerData.self, from: data)
+        return try! JSONDecoder().decode(TrackerData.self, from: data)
+    }()
+    // swiftlint:enable force_try
 
+    func testLoadingRules() throws {
         let rules = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(withExceptions: ["duckduckgo.com"],
         andTemporaryUnprotectedDomains: [])
 
@@ -41,6 +45,39 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         } else {
             XCTFail("Missing domain exception")
         }
+    }
+
+    func testLoadingRulesIsDeterministic() {
+        let firstGeneration = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(
+            withExceptions: [],
+            andTemporaryUnprotectedDomains: []
+        ).map { $0.trigger.urlFilter }
+
+        let secondGeneration = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(
+            withExceptions: [],
+            andTemporaryUnprotectedDomains: []
+        ).map { $0.trigger.urlFilter }
+
+        // The data set is large enough that comparing these is slow, so check batches at the start and end.
+        XCTAssertEqual(firstGeneration.prefix(upTo: 1000), secondGeneration.prefix(upTo: 1000))
+        XCTAssertEqual(firstGeneration.suffix(1000), secondGeneration.suffix(1000))
+    }
+
+    func testLoadingRulesIsDeterministic_MockData() {
+        let data = JSONTestDataLoader.mockTrackerData
+        let mockData = try! JSONDecoder().decode(TrackerData.self, from: data)
+
+        let firstGeneration = ContentBlockerRulesBuilder(trackerData: mockData).buildRules(
+            withExceptions: [],
+            andTemporaryUnprotectedDomains: []
+        ).map { $0.trigger.urlFilter }
+
+        let secondGeneration = ContentBlockerRulesBuilder(trackerData: mockData).buildRules(
+            withExceptions: [],
+            andTemporaryUnprotectedDomains: []
+        ).map { $0.trigger.urlFilter }
+
+        XCTAssertEqual(firstGeneration, secondGeneration)
     }
 
 }

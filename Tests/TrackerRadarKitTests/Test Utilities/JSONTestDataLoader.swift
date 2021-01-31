@@ -24,6 +24,10 @@ class JSONTestDataLoader {
         JSONTestDataLoader().fromJSONFile("trackerData")
     }
 
+    static var mockTrackerData: Data {
+        JSONTestDataLoader().fromJSONFile("mockTrackerData")
+    }
+
     private var bundle: Bundle {
         Bundle.module
     }

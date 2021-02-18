@@ -10,7 +10,7 @@ DuckDuckGo is growing fast and we continue to expand our fully distributed team.
 
 It can be built manually two ways:
 
-1. Build the  `TrackerRadarKit` scheme via the included Xcode project
+1. Build the  `TrackerRadarKit` scheme by opening the Swift package in Xcode
 2. Run `swift build -c release` to build a release binary
 
 ### SwiftLint

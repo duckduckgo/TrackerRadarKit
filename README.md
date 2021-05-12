@@ -17,6 +17,16 @@ It can be built manually two ways:
 
 We use [SwiftLint](https://github.com/realm/SwiftLint) for enforcing Swift style and conventions, so you'll need to [install it](https://github.com/realm/SwiftLint#installation).
 
+### Validator
+
+The Validator tool can be used to validate that Tracker Radar data can be parsed, transformed and compiled by WebKit's content rule list store.   As such, it requires macos 10.13 to run.
+
+To build, check out the code and run from the project root:
+* `swift build`
+
+To run, execute the following from the project root:
+* `.build/debug/Validator`
+
 ## License
 
 DuckDuckGo is distributed under the Apache 2.0 [license](https://github.com/duckduckgo/ios/blob/master/LICENSE).

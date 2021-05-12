@@ -39,56 +39,93 @@ struct Validator: ParsableCommand {
         guard let data = trackerRadarFile.fileContentsAsData() else {
             throw ValidatorError.failedToReadFile(fileName: trackerRadarFile)
         }
-        print(Date(), "File loaded")
 
         let trackerRadar = try JSONDecoder().decode(TrackerData.self, from: data)
-        print(Date(), "File decoded from TrackerRadar JSON")
+        print(Date(),
+              trackerRadar.trackers.count,
+              "trackers.",
+              trackerRadar.domains.count,
+              "domains.",
+              trackerRadar.cnames?.count ?? 0,
+              "cnames.",
+              trackerRadar.entities.count,
+              "entities.")
 
         let temporaryUnprotectedDomains = temporaryUnprotectedList?.fileContentsAsStringArray()
         if let domains = temporaryUnprotectedDomains {
-            print(Date(), "\(domains.count) unprotected domains")
+            print("\(domains.count) unprotected domains")
         } else {
-            print(Date(), "No unprotected domains")
+            print("No unprotected domains")
         }
 
+        do {
+            try compile("Complete", trackerRadar: trackerRadar, temporaryUnprotectedDomains: temporaryUnprotectedDomains)
+            print("Compilation success")
+        } catch {
+            print("Compilation failed")
+
+            // Check it wasn't the unprotected domains
+            if temporaryUnprotectedDomains != nil {
+                print("Checking temporary unprotected domains")
+                do {
+                    try compile("temporaryUnprotectedDomains", trackerRadar: trackerRadar, temporaryUnprotectedDomains: nil)
+                    print("Error with temporary unprotected domains")
+                } catch {
+                    // Wasn't the temporary unprotected domains then
+                }
+            }
+
+            // Check each tracker in turn
+            print("Checking each tracker, please wait")
+            for tracker in trackerRadar.trackers.sorted(by: { $0.key < $1.key }) {
+                if tracker.value.defaultAction == .ignore && tracker.value.rules?.isEmpty ?? true {
+                    print("Skipping \(tracker.key), default ignore and no rules")
+                    continue
+                }
+
+                do {
+                    let single = TrackerData(trackers: [tracker.key: tracker.value],
+                                             entities: trackerRadar.entities,
+                                             domains: trackerRadar.domains,
+                                             cnames: trackerRadar.cnames)
+
+                    try compile(tracker.key, trackerRadar: single, temporaryUnprotectedDomains: nil)
+                } catch {
+                    print()
+                    print("Error with tracker `\(tracker.key)`", error)
+                }
+            }
+
+            print()
+            throw error
+        }
+    }
+
+    func compile(_ identifier: String, trackerRadar: TrackerData, temporaryUnprotectedDomains: [String]?  ) throws {
+
         let rules = ContentBlockerRulesBuilder(trackerData: trackerRadar).buildRules(withExceptions: nil, andTemporaryUnprotectedDomains: temporaryUnprotectedDomains)
-        print(Date(), "Rules built")
 
         let jsonData = try JSONEncoder().encode(rules)
-        print(Date(), "Rules encoded into Apple JSON")
 
         let ruleList = String(data: jsonData, encoding: .utf8)
-        print(Date(), "Apple JSON encoded as string")
 
-        let group = DispatchGroup()
-        let startDate = Date()
         var compilationError: Error?
-
-        group.enter()
-        print(Date(), "Compilation starting...")
         WKContentRuleListStore.default()?.compileContentRuleList(
-            forIdentifier: "any",
+            forIdentifier: identifier,
             encodedContentRuleList: ruleList,
-            completionHandler: { list, error in
-
-                let time = Date().timeIntervalSince(startDate)
-                print(Date(), "Compilation finished in \(time)s")
+            completionHandler: { _, error in
                 compilationError = error
-
-                group.leave()
         })
 
-        group.wait()
         if let error = compilationError {
             throw error
         }
-
-        print(Date(), "Compilation success")
     }
+
 }
 
 if #available(OSX 10.13, *) {
-    Validator   .main()
+    Validator.main()
 } else {
     print("macos 10.13 or higher is required")
 }
@@ -102,6 +139,14 @@ extension String {
     func fileContentsAsStringArray() -> [String]? {
         guard let data = fileContentsAsData() else { return nil }
         return String(data: data, encoding: .utf8)?.components(separatedBy: .newlines).map { $0.trimmingCharacters(in: .whitespaces) }
+    }
+
+}
+
+extension KnownTracker {
+
+    func toJson() -> String {
+        return String(data: try! JSONEncoder().encode(self), encoding: .utf8)!
     }
 
 }

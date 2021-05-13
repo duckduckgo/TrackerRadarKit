@@ -10,12 +10,22 @@ DuckDuckGo is growing fast and we continue to expand our fully distributed team.
 
 It can be built manually two ways:
 
-1. Build the  `TrackerRadarKit` scheme via the included Xcode project
+1. Build the  `TrackerRadarKit` scheme by opening the Swift package in Xcode
 2. Run `swift build -c release` to build a release binary
 
 ### SwiftLint
 
 We use [SwiftLint](https://github.com/realm/SwiftLint) for enforcing Swift style and conventions, so you'll need to [install it](https://github.com/realm/SwiftLint#installation).
+
+### Validator
+
+The Validator tool can be used to validate that Tracker Radar data can be parsed, transformed and compiled by WebKit's content rule list store.   As such, it requires macos 10.13 to run.
+
+To build, check out the code and run from the project root:
+* `swift build`
+
+To run, execute the following from the project root:
+* `.build/debug/Validator`
 
 ## License
 

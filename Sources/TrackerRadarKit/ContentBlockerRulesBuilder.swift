@@ -42,7 +42,8 @@ public struct ContentBlockerRulesBuilder {
     
     /// Build all the rules for the given tracker data and list of exceptions.
     public func buildRules(withExceptions exceptions: [String]? = nil,
-                           andTemporaryUnprotectedDomains tempUnprotectedDomains: [String]? = nil) -> [ContentBlockerRule] {
+                           andTemporaryUnprotectedDomains tempUnprotectedDomains: [String]? = nil,
+                           andTrackerAllowlist trackerAllowlist: [TrackerException] = []) -> [ContentBlockerRule] {
         
         let trackerRules = trackerData.trackers.values.compactMap {
             buildRules(from: $0)
@@ -58,7 +59,9 @@ public struct ContentBlockerRulesBuilder {
 
         let cnameRules = cnameTrackers.map(buildRules(from:)).flatMap { $0 }
 
-        return trackerRules + cnameRules + buildExceptions(from: exceptions, andUnprotectedDomains: tempUnprotectedDomains)
+        return trackerRules + cnameRules + buildExceptions(from: exceptions,
+                                                           unprotectedDomains: tempUnprotectedDomains,
+                                                           trackerAllowlist: trackerAllowlist)
     }
     
     /// Build the rules for a specific tracker.
@@ -77,10 +80,41 @@ public struct ContentBlockerRulesBuilder {
         return blockingRules + dedupedRules
     }
     
-    private func buildExceptions(from exceptions: [String]?, andUnprotectedDomains unprotectedDomains: [String]?) -> [ContentBlockerRule] {
-        let allExceptions = (exceptions ?? []) + (unprotectedDomains?.wildcards() ?? [])
-        guard !allExceptions.isEmpty else { return [] }
-        return [ContentBlockerRule(trigger: .trigger(urlFilter: ".*", ifDomain: allExceptions, resourceType: nil), action: .ignorePreviousRules())]
+    private func buildExceptions(from exceptions: [String]?,
+                                 unprotectedDomains: [String]?,
+                                 trackerAllowlist: [TrackerException]) -> [ContentBlockerRule] {
+        let domainExceptions = (exceptions ?? []) + (unprotectedDomains?.wildcards() ?? [])
+
+        let result: [ContentBlockerRule]
+        if domainExceptions.isEmpty {
+            result = []
+        } else {
+            result = [ContentBlockerRule(trigger: .trigger(urlFilter: ".*", ifDomain: domainExceptions, resourceType: nil), action: .ignorePreviousRules())]
+        }
+
+        let allowlistRules: [ContentBlockerRule] = trackerAllowlist.compactMap { exception in
+
+            var rule = exception.rule
+            let index = exception.rule.firstIndex(of: "/")
+            if let index = index {
+                rule.insert(contentsOf: "(:[0-9]+)?", at: index) // ? or *
+            }
+
+            let urlFilter = Constants.subDomainPrefix + rule.regexEscape() + ".*"
+
+            switch exception.matching {
+            case .all:
+                return ContentBlockerRule(trigger: .trigger(urlFilter: urlFilter),
+                                   action: .ignorePreviousRules())
+            case .domains(let domains):
+                return ContentBlockerRule(trigger: .trigger(urlFilter: urlFilter, ifDomain: domains.wildcards(), resourceType: nil),
+                                   action: .ignorePreviousRules())
+            case .none:
+                return nil
+            }
+        }
+
+        return result + allowlistRules
     }
     
     private func buildBlockingRules(from tracker: KnownTracker) -> [ContentBlockerRule] {
@@ -189,7 +223,7 @@ fileprivate extension String {
     
     func regexEscape() -> String {
         return replacingOccurrences(of: "\\", with: "\\\\")
-            .replacingOccurrences(of: ".", with: "\\.")
+            .replacingOccurrences(of: ".", with: "\\.").replacingOccurrences(of: "/", with: "\\/")
     }
     
 }

@@ -32,5 +32,5 @@ public struct TrackerException {
     public init(rule: String, matching: Matching) {
         self.rule = rule
         self.matching = matching
-    }
+    } 
 }

@@ -79,6 +79,16 @@ public struct ContentBlockerRulesBuilder {
         
         return blockingRules + dedupedRules
     }
+
+    static public func makeRegexpFilter(fromAllowlistRule rule: String) -> String {
+        var rule = rule
+        let index = rule.firstIndex(of: "/")
+        if let index = index {
+            rule.insert(contentsOf: "(:[0-9]+)?", at: index)
+        }
+
+        return Constants.subDomainPrefix + rule.regexEscape() + ".*"
+    }
     
     private func buildExceptions(from exceptions: [String]?,
                                  unprotectedDomains: [String]?,
@@ -94,13 +104,7 @@ public struct ContentBlockerRulesBuilder {
 
         let allowlistRules: [ContentBlockerRule] = trackerAllowlist.compactMap { exception in
 
-            var rule = exception.rule
-            let index = exception.rule.firstIndex(of: "/")
-            if let index = index {
-                rule.insert(contentsOf: "(:[0-9]+)?", at: index) // ? or *
-            }
-
-            let urlFilter = Constants.subDomainPrefix + rule.regexEscape() + ".*"
+            let urlFilter = Self.makeRegexpFilter(fromAllowlistRule: exception.rule)
 
             switch exception.matching {
             case .all:

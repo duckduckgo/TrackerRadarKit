@@ -46,7 +46,7 @@ public struct ContentBlockerRulesBuilder {
                            andTrackerAllowlist trackerAllowlist: [TrackerException] = []) -> [ContentBlockerRule] {
         
         let trackerRules = trackerData.trackers.values.compactMap {
-            buildRules(from: $0, loadType: .thirdParty)
+            buildRules(from: $0, loadTypes: [ .thirdParty ])
         }.flatMap { $0 }
         
         var cnameTrackers = [KnownTracker]()
@@ -57,7 +57,7 @@ public struct ContentBlockerRulesBuilder {
             cnameTrackers.append(newTracker)
         }
 
-        let cnameRules = cnameTrackers.map { buildRules(from: $0, loadType: .firstParty) }.flatMap { $0 }
+        let cnameRules = cnameTrackers.map { buildRules(from: $0, loadTypes: [.firstParty, .thirdParty]) }.flatMap { $0 }
 
         return trackerRules + cnameRules + buildExceptions(from: exceptions,
                                                            unprotectedDomains: tempUnprotectedDomains,
@@ -66,12 +66,12 @@ public struct ContentBlockerRulesBuilder {
     }
     
     /// Build the rules for a specific tracker.
-    public func buildRules(from tracker: KnownTracker, loadType: ContentBlockerRule.Trigger.LoadType) -> [ContentBlockerRule] {
+    public func buildRules(from tracker: KnownTracker, loadTypes: [ContentBlockerRule.Trigger.LoadType]) -> [ContentBlockerRule] {
         
-        let blockingRules: [ContentBlockerRule] = buildBlockingRules(from: tracker, loadType: loadType)
+        let blockingRules: [ContentBlockerRule] = buildBlockingRules(from: tracker, loadTypes: loadTypes)
         
         let specialRules = tracker.rules?.compactMap { r -> [ContentBlockerRule] in
-            buildRules(fromRule: r, inTracker: tracker, loadType: loadType)
+            buildRules(fromRule: r, inTracker: tracker, loadTypes: loadTypes)
             } ?? []
         
         let sortedRules = specialRules.sorted(by: { $0.count > $1.count })
@@ -102,7 +102,7 @@ public struct ContentBlockerRulesBuilder {
             result = []
         } else {
             result = [ContentBlockerRule(trigger: .trigger(urlFilter: ".*", ifDomain: domainExceptions,
-                                                           resourceType: nil, loadType: loadTypes),
+                                                           resourceType: nil, loadTypes: loadTypes),
                                          action: .ignorePreviousRules())]
         }
 
@@ -112,11 +112,11 @@ public struct ContentBlockerRulesBuilder {
 
             switch exception.matching {
             case .all:
-                return ContentBlockerRule(trigger: .trigger(urlFilter: urlFilter, loadType: loadTypes),
+                return ContentBlockerRule(trigger: .trigger(urlFilter: urlFilter, loadTypes: loadTypes),
                                    action: .ignorePreviousRules())
             case .domains(let domains):
                 return ContentBlockerRule(trigger: .trigger(urlFilter: urlFilter, ifDomain: domains.wildcards(),
-                                                            resourceType: nil, loadType: loadTypes),
+                                                            resourceType: nil, loadTypes: loadTypes),
                                    action: .ignorePreviousRules())
             case .none:
                 return nil
@@ -126,50 +126,50 @@ public struct ContentBlockerRulesBuilder {
         return result + allowlistRules
     }
     
-    private func buildBlockingRules(from tracker: KnownTracker, loadType: ContentBlockerRule.Trigger.LoadType) -> [ContentBlockerRule] {
+    private func buildBlockingRules(from tracker: KnownTracker, loadTypes: [ContentBlockerRule.Trigger.LoadType]) -> [ContentBlockerRule] {
         guard tracker.defaultAction == .block else { return [] }
         guard let domain = tracker.domain else { return [] }
         let urlFilter = Constants.subDomainPrefix + domain.regexEscape() + Constants.domainMatchSuffix
         return [ ContentBlockerRule(trigger: .trigger(urlFilter: urlFilter,
                                                       unlessDomain: trackerData.relatedDomains(for: tracker.owner)?.wildcards(),
-                                                      loadType: [ loadType ]),
+                                                      loadTypes: loadTypes),
                                     action: .block()) ]        
     }
 
     private func buildRules(fromRule r: KnownTracker.Rule,
                             inTracker tracker: KnownTracker,
-                            loadType: ContentBlockerRule.Trigger.LoadType) -> [ContentBlockerRule] {
+                            loadTypes: [ContentBlockerRule.Trigger.LoadType]) -> [ContentBlockerRule] {
         
         return tracker.defaultAction == .block ?
-            buildRulesForBlockingTracker(fromRule: r, inTracker: tracker, loadType: loadType) :
-            buildRulesForIgnoringTracker(fromRule: r, inTracker: tracker, loadType: loadType)
+            buildRulesForBlockingTracker(fromRule: r, inTracker: tracker, loadTypes: loadTypes) :
+            buildRulesForIgnoringTracker(fromRule: r, inTracker: tracker, loadTypes: loadTypes)
     }
     
     private func buildRulesForIgnoringTracker(fromRule r: KnownTracker.Rule,
                                               inTracker tracker: KnownTracker,
-                                              loadType: ContentBlockerRule.Trigger.LoadType) -> [ContentBlockerRule] {
+                                              loadTypes: [ContentBlockerRule.Trigger.LoadType]) -> [ContentBlockerRule] {
         if r.action == .some(.ignore) {
             return [
-                block(r, withOwner: tracker.owner, loadType: loadType),
-                ignorePrevious(r, matching: r.options, loadType: loadType)
+                block(r, withOwner: tracker.owner, loadTypes: loadTypes),
+                ignorePrevious(r, matching: r.options, loadTypes: loadTypes)
             ]
         } else if r.options == nil && r.exceptions == nil {
             return [
-                block(r, withOwner: tracker.owner, loadType: loadType)
+                block(r, withOwner: tracker.owner, loadTypes: loadTypes)
             ]
         } else if r.exceptions != nil && r.options != nil {
             return [
-                block(r, withOwner: tracker.owner, matching: r.options, loadType: loadType),
-                ignorePrevious(r, matching: r.exceptions, loadType: loadType)
+                block(r, withOwner: tracker.owner, matching: r.options, loadTypes: loadTypes),
+                ignorePrevious(r, matching: r.exceptions, loadTypes: loadTypes)
             ]
         } else if r.options != nil {
             return [
-                block(r, withOwner: tracker.owner, matching: r.options, loadType: loadType)
+                block(r, withOwner: tracker.owner, matching: r.options, loadTypes: loadTypes)
             ]
         } else if r.exceptions != nil {
             return [
-                block(r, withOwner: tracker.owner, loadType: loadType),
-                ignorePrevious(r, matching: r.exceptions, loadType: loadType)
+                block(r, withOwner: tracker.owner, loadTypes: loadTypes),
+                ignorePrevious(r, matching: r.exceptions, loadTypes: loadTypes)
             ]
         }
         
@@ -178,30 +178,30 @@ public struct ContentBlockerRulesBuilder {
     
     private func buildRulesForBlockingTracker(fromRule r: KnownTracker.Rule,
                                               inTracker tracker: KnownTracker,
-                                              loadType: ContentBlockerRule.Trigger.LoadType) -> [ContentBlockerRule] {
+                                              loadTypes: [ContentBlockerRule.Trigger.LoadType]) -> [ContentBlockerRule] {
         
         if r.options != nil && r.exceptions != nil {
             return [
-                ignorePrevious(r, loadType: loadType),
-                block(r, withOwner: tracker.owner, matching: r.options, loadType: loadType),
-                ignorePrevious(r, matching: r.exceptions, loadType: loadType)
+                ignorePrevious(r, loadTypes: loadTypes),
+                block(r, withOwner: tracker.owner, matching: r.options, loadTypes: loadTypes),
+                ignorePrevious(r, matching: r.exceptions, loadTypes: loadTypes)
             ]
         } else if r.action == .some(.ignore) {
             return [
-                ignorePrevious(r, matching: r.options, loadType: loadType)
+                ignorePrevious(r, matching: r.options, loadTypes: loadTypes)
             ]
         } else if r.options != nil {
             return [
-                ignorePrevious(r, loadType: loadType),
-                block(r, withOwner: tracker.owner, matching: r.options, loadType: loadType)
+                ignorePrevious(r, loadTypes: loadTypes),
+                block(r, withOwner: tracker.owner, matching: r.options, loadTypes: loadTypes)
             ]
         } else if r.exceptions != nil {
             return [
-                ignorePrevious(r, matching: r.exceptions, loadType: loadType)
+                ignorePrevious(r, matching: r.exceptions, loadTypes: loadTypes)
             ]
         } else {
             return [
-                block(r, withOwner: tracker.owner, loadType: loadType)
+                block(r, withOwner: tracker.owner, loadTypes: loadTypes)
             ]
         }
     }
@@ -209,7 +209,7 @@ public struct ContentBlockerRulesBuilder {
     private func block(_ rule: KnownTracker.Rule,
                        withOwner owner: KnownTracker.Owner?,
                        matching: KnownTracker.Rule.Matching? = nil,
-                       loadType: ContentBlockerRule.Trigger.LoadType) -> ContentBlockerRule {
+                       loadTypes: [ContentBlockerRule.Trigger.LoadType]) -> ContentBlockerRule {
         
         if let matching = matching {
             return ContentBlockerRule(trigger: .trigger(urlFilter: rule.normalizedRule(),
@@ -220,17 +220,17 @@ public struct ContentBlockerRulesBuilder {
         } else {
             return ContentBlockerRule(trigger: .trigger(urlFilter: rule.normalizedRule(),
                                                         unlessDomain: trackerData.relatedDomains(for: owner)?.wildcards(),
-                                                        loadType: [ loadType ]),
+                                                        loadTypes: loadTypes),
                                       action: .block())
         }
     }
     
     private func ignorePrevious(_ rule: KnownTracker.Rule, matching: KnownTracker.Rule.Matching? = nil,
-                                loadType: ContentBlockerRule.Trigger.LoadType) -> ContentBlockerRule {
+                                loadTypes: [ContentBlockerRule.Trigger.LoadType]) -> ContentBlockerRule {
         return ContentBlockerRule(trigger: .trigger(urlFilter: rule.normalizedRule(),
                                                     ifDomain: matching?.domains?.prefixAll(with: "*"),
                                                     resourceType: matching?.types?.mapResources(),
-                                                    loadType: [ loadType ]),
+                                                    loadTypes: loadTypes),
                                   action: .ignorePreviousRules())
     }
     

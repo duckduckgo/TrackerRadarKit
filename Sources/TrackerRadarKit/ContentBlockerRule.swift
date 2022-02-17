@@ -41,6 +41,7 @@ public struct ContentBlockerRule: Codable, Hashable {
         public enum LoadType: String, Codable {
          
             case thirdParty = "third-party"
+            case firstParty = "first-party"
             
         }
 
@@ -70,12 +71,17 @@ public struct ContentBlockerRule: Codable, Hashable {
             return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: nil, resourceType: nil, loadType: loadType)
         }
         
-        static func trigger(urlFilter filter: String, unlessDomain urls: [String]?) -> Trigger {
+        static func trigger(urlFilter filter: String, unlessDomain urls: [String]?, loadType: [LoadType]? = [ .thirdParty ] ) -> Trigger {
             return Trigger(urlFilter: filter, unlessDomain: urls, ifDomain: nil, resourceType: nil, loadType: [ .thirdParty ])
         }
 
         static func trigger(urlFilter filter: String, ifDomain domains: [String]?, resourceType types: [ResourceType]?) -> Trigger {
             return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: domains, resourceType: types, loadType: [ .thirdParty ])
+        }
+        
+        static func trigger(urlFilter filter: String, ifDomain domains: [String]?, resourceType types: [ResourceType]?,
+                            loadType: [LoadType]? = [ .thirdParty ]) -> Trigger {
+            return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: domains, resourceType: types, loadType: loadType)
         }
     }
 

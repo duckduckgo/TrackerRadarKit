@@ -41,6 +41,7 @@ public struct ContentBlockerRule: Codable, Hashable {
         public enum LoadType: String, Codable {
          
             case thirdParty = "third-party"
+            case firstParty = "first-party"
             
         }
 
@@ -66,16 +67,21 @@ public struct ContentBlockerRule: Codable, Hashable {
             self.loadType = loadType
         }
         
-        static func trigger(urlFilter filter: String, loadType: [LoadType]? = [ .thirdParty ]) -> Trigger {
-            return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: nil, resourceType: nil, loadType: loadType)
+        static func trigger(urlFilter filter: String, loadTypes: [LoadType]? = [ .thirdParty ]) -> Trigger {
+            return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: nil, resourceType: nil, loadType: loadTypes)
         }
         
-        static func trigger(urlFilter filter: String, unlessDomain urls: [String]?) -> Trigger {
-            return Trigger(urlFilter: filter, unlessDomain: urls, ifDomain: nil, resourceType: nil, loadType: [ .thirdParty ])
+        static func trigger(urlFilter filter: String, unlessDomain urls: [String]?, loadTypes: [LoadType]? = [ .thirdParty ] ) -> Trigger {
+            return Trigger(urlFilter: filter, unlessDomain: urls, ifDomain: nil, resourceType: nil, loadType: loadTypes)
         }
 
         static func trigger(urlFilter filter: String, ifDomain domains: [String]?, resourceType types: [ResourceType]?) -> Trigger {
             return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: domains, resourceType: types, loadType: [ .thirdParty ])
+        }
+        
+        static func trigger(urlFilter filter: String, ifDomain domains: [String]?, resourceType types: [ResourceType]?,
+                            loadTypes: [LoadType]? = [ .thirdParty ]) -> Trigger {
+            return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: domains, resourceType: types, loadType: loadTypes)
         }
     }
 

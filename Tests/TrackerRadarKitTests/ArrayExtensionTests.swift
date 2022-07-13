@@ -25,7 +25,7 @@ class ArrayExtensionTests: XCTestCase {
         let array = Array(1...10)
         let deduplicated = array.removeDuplicates()
 
-        XCTAssertNotEqual(array, deduplicated)
+        XCTAssertEqual(array, deduplicated)
     }
 
     func testRemoveDuplicates_duplicates() {

@@ -112,8 +112,8 @@ public struct ContentBlockerRule: Codable, Hashable {
         
     }
     
-    let trigger: Trigger
-    let action: Action
+    public let trigger: Trigger
+    public let action: Action
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(trigger)

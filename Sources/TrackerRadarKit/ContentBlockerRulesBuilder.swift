@@ -26,7 +26,7 @@ public struct ContentBlockerRulesBuilder {
         static let domainMatchSuffix = "(:?[0-9]+)?/.*"
     }
     
-    static let resourceMapping: [String: ContentBlockerRule.Trigger.ResourceType] = [
+    public static let resourceMapping: [String: ContentBlockerRule.Trigger.ResourceType] = [
         "script": .script,
         "xmlhttprequest": .raw,
         "subdocument": .document,

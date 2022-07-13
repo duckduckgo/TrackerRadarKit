@@ -21,8 +21,6 @@ import Foundation
 extension Array where Element: Hashable {
 
     func removeDuplicates() -> [Element] {
-        let string = "string" as! NSString
-        
         var existingElements = Set<Element>()
         return self.filter { existingElements.insert($0).inserted }
     }

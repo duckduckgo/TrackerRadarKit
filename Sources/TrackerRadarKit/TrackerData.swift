@@ -179,7 +179,11 @@ public struct KnownTracker: Codable, Equatable {
 extension KnownTracker {
 
     static let displayCategories = [
-        "Analytics", "Advertising", "Social Network"
+        "Analytics",
+        "Advertising",
+        "Social Network",
+        "Content Delivery",
+        "Embedded Content"
     ]
 
     public var category: String? {

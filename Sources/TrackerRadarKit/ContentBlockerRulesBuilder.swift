@@ -81,6 +81,10 @@ public struct ContentBlockerRulesBuilder {
         return blockingRules + dedupedRules
     }
 
+    static public func buildRule(trigger: ContentBlockerRule.Trigger, withAction action: ContentBlockerRule.Action) -> ContentBlockerRule {
+        return ContentBlockerRule(trigger: trigger, action: action)
+    }
+
     static public func makeRegexpFilter(fromAllowlistRule rule: String) -> String {
         var rule = rule
         let index = rule.firstIndex(of: "/")

@@ -26,7 +26,7 @@ public struct ContentBlockerRulesBuilder {
         static let domainMatchSuffix = "(:?[0-9]+)?/.*"
     }
     
-    static let resourceMapping: [String: ContentBlockerRule.Trigger.ResourceType] = [
+    public static let resourceMapping: [String: ContentBlockerRule.Trigger.ResourceType] = [
         "script": .script,
         "xmlhttprequest": .raw,
         "subdocument": .document,
@@ -79,6 +79,10 @@ public struct ContentBlockerRulesBuilder {
         let dedupedRules = sortedRules.flatMap { $0 }.removeDuplicates()
         
         return blockingRules + dedupedRules
+    }
+
+    static public func buildRule(trigger: ContentBlockerRule.Trigger, withAction action: ContentBlockerRule.Action) -> ContentBlockerRule {
+        return ContentBlockerRule(trigger: trigger, action: action)
     }
 
     static public func makeRegexpFilter(fromAllowlistRule rule: String) -> String {

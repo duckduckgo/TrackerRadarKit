@@ -45,12 +45,8 @@ jobs:
         submodules: recursive
 
     - name: Run tests
-      # BSK does not support running tests in parallel, but the flag is required
-      # to make XUnit output work. Making it parallel with 1 worker then.
-      # https://stackoverflow.com/a/70040836
       run: |
-        swift test --parallel --num-workers=1 \
-          ${{ matrix.skipped_tests }} \
+        swift test --parallel \
           --xunit-output tests-${{ matrix.os }}.xml
 
     - name: Publish Unit Tests Report

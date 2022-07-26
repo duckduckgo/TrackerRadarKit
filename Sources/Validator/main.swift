@@ -34,6 +34,7 @@ struct Validator: ParsableCommand {
     @Argument(help: "Temporary unprotected list.")
     var temporaryUnprotectedList: String?
 
+    // swiftlint:disable:next function_body_length
     mutating func run() throws {
 
         guard let data = trackerRadarFile.fileContentsAsData() else {
@@ -103,7 +104,8 @@ struct Validator: ParsableCommand {
 
     func compile(_ identifier: String, trackerRadar: TrackerData, temporaryUnprotectedDomains: [String]?  ) throws {
 
-        let rules = ContentBlockerRulesBuilder(trackerData: trackerRadar).buildRules(withExceptions: nil, andTemporaryUnprotectedDomains: temporaryUnprotectedDomains)
+        let rules = ContentBlockerRulesBuilder(trackerData: trackerRadar).buildRules(withExceptions: nil,
+                                                                                     andTemporaryUnprotectedDomains: temporaryUnprotectedDomains)
 
         let jsonData = try JSONEncoder().encode(rules)
 
@@ -146,8 +148,11 @@ extension String {
 extension KnownTracker {
 
     func toJson() -> String {
-        return String(data: try! JSONEncoder().encode(self), encoding: .utf8)!
+        guard let encodedData = try? JSONEncoder().encode(self) else {
+            fatalError()
+        }
+
+        return String(data: encodedData, encoding: .utf8)!
     }
 
 }
-

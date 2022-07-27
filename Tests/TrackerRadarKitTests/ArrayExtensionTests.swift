@@ -32,7 +32,7 @@ class ArrayExtensionTests: XCTestCase {
         let array = Array(1...100) + Array(1...100)
         let deduplicated = array.removeDuplicates()
 
-        XCTAssertEqual(array.count, 202)
+        XCTAssertEqual(array.count, 200)
         XCTAssertEqual(deduplicated.count, 100)
         XCTAssertEqual(deduplicated, Array(1...100))
     }

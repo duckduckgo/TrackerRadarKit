@@ -34,8 +34,6 @@ public struct ContentBlockerRule: Codable, Hashable {
             case raw
             case svg = "svg-document"
             case media
-
-
             case popup
 
         }

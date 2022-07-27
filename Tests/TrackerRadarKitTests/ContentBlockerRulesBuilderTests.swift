@@ -65,7 +65,10 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
 
     func testLoadingRulesIsDeterministic_MockData() {
         let data = JSONTestDataLoader.mockTrackerData
-        let mockData = try! JSONDecoder().decode(TrackerData.self, from: data)
+        guard let mockData = try? JSONDecoder().decode(TrackerData.self, from: data) else {
+            XCTFail("Failed to decode tracker data")
+            return
+        }
 
         let firstGeneration = ContentBlockerRulesBuilder(trackerData: mockData).buildRules(
             withExceptions: [],

@@ -20,7 +20,7 @@ import Foundation
 
 extension Array where Element: Hashable {
 
-    func removeDuplica7tes() -> [Element] {
+    func removeDuplicates() -> [Element] {
         var existingElements = Set<Element>()
         return self.filter { existingElements.insert($0).inserted }
     }

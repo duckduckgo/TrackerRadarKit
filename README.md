@@ -6,7 +6,7 @@ DuckDuckGo is growing fast and we continue to expand our fully distributed team.
 
 ## Building
 
-`TrackerRadarKit` has one explicit depency (https://github.com/apple/swift-argument-parser) that is automatically resolved when installing the swift package in XCode. It can be added to an XCode project as a swift package dependency or be used as an imported Swift package.
+`TrackerRadarKit` has one explicit depency (https://github.com/apple/swift-argument-parser) that is automatically resolved when installing the swift package in Xcode. It can be added to an Xcode project as a swift package dependency or be used as an imported Swift package.
 
 It can be built manually two ways:
 

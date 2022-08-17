@@ -41,6 +41,14 @@ public struct ContentBlockerRulesBuilder {
     }
     
     /// Build all the rules for the given tracker data and list of exceptions.
+    ///
+    /// - Parameters:
+    ///   - exceptions: A list of domains to be excluded from the rules list
+    ///   - tempUnprotectedDomains: A list of wildcard-matching domains to be excluded from the rules list
+    ///   - trackerAllowlist: A list of tracker rules to be excluded from the rules list
+    ///
+    /// - Returns: A list of ContentBlockerRule items. This list can be encoded and then used to compile a WKContentRuleListStore content rule list.
+    
     public func buildRules(withExceptions exceptions: [String]? = nil,
                            andTemporaryUnprotectedDomains tempUnprotectedDomains: [String]? = nil,
                            andTrackerAllowlist trackerAllowlist: [TrackerException] = []) -> [ContentBlockerRule] {

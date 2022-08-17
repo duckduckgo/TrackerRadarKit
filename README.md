@@ -33,41 +33,16 @@ We recommend the use of [Swift Package Manager](https://www.swift.org/package-ma
 
 ## How to block trackers
 
-In order to block content on the web view you need to [compile](https://developer.apple.com/documentation/webkit/wkcontentruleliststore/2902761-compilecontentrulelist/) a content rule list using  Apple's [WKContentRuleListStore](https://developer.apple.com/documentation/webkit/wkcontentruleliststore). 
+
+In order to block content on the web view you need to [compile](https://developer.apple.com/documentation/webkit/wkcontentruleliststore/2902761-compilecontentrulelist/) a content rule list using  Apple's [WKContentRuleListStore](https://developer.apple.com/documentation/webkit/wkcontentruleliststore), then apply compiled rule list to WKUserContentController.
+
 TrackerRadarKit allows you to generate this list using DuckDuckGo's [Tracker Radar](https://github.com/duckduckgo/tracker-radar) as source.
 The main structs you'll need to use to create a content rule lists are:
 
-* [TrackerData](https://github.com/duckduckgo/TrackerRadarKit/blob/main/Sources/TrackerRadarKit/TrackerData.swift) -  Tracker Radar [JSON file](http://staticcdn.duckduckgo.com/trackerblocking/v2.1/tds.json) encoded format;
+* [TrackerData](https://github.com/duckduckgo/TrackerRadarKit/blob/main/Sources/TrackerRadarKit/TrackerData.swift) -  Tracker Radar [JSON file](https://staticcdn.duckduckgo.com/trackerblocking/v2.1/tds.json) encoded format;
 
 * [ContentBlockerRulesBuilder](https://github.com/duckduckgo/TrackerRadarKit/blob/main/Sources/TrackerRadarKit/ContentBlockerRulesBuilder.swift) - uses  TrackerData to generate a list of [ContentBlockerRules](https://github.com/duckduckgo/TrackerRadarKit/blob/main/Sources/TrackerRadarKit/ContentBlockerRule.swift) which can be encoded as a JSON source for the new rule list. To find more about the content rule list specifications, please visit [Apple's documentation](https://developer.apple.com/documentation/safariservices/creating_a_content_blocker).
 
-## ContentBlockerRulesBuilder
-
-### Creating a ContentBlockerRulesBuilder
-```swift
-init(trackerData: TrackerData)
-```
-&emsp; &emsp; Creates a content blocker rules builder with the specified TrackerData
-
-### Building the rules
-
-```swift
-func buildRules(withExceptions exceptions: [String]? = nil,
-                andTemporaryUnprotectedDomains tempUnprotectedDomains: [String]? = nil,
-                andTrackerAllowlist trackerAllowlist: [TrackerException] = []) -> [ContentBlockerRule]
-```
-&emsp; &emsp; Build all the rules for the given tracker data and list of exceptions.
-
-### Parameters
-&emsp;**exceptions**: User level exception domain list
-
-&emsp;**tempUnprotectedDomains**: System level exception domain list
-
-&emsp;**trackerAllowList**: System level tracker rules exception list
-
-### Return Value
-
-A list of `ContentBlockerRule` items that can be encoded to be compiled with `WKContentRuleListStore`
 
 ### Example
 ```swift

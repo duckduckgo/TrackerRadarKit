@@ -42,7 +42,7 @@ The main structs you'll need to use to create a content rule lists are:
 * [ContentBlockerRulesBuilder](https://github.com/duckduckgo/TrackerRadarKit/blob/main/Sources/TrackerRadarKit/ContentBlockerRulesBuilder.swift) - uses  TrackerData to generate a list of [ContentBlockerRules](https://github.com/duckduckgo/TrackerRadarKit/blob/main/Sources/TrackerRadarKit/ContentBlockerRule.swift) which can be encoded as a JSON source for the new rule list. To find more about the content rule list specifications, please visit [Apple's documentation](https://developer.apple.com/documentation/safariservices/creating_a_content_blocker).
 
 ## ContentBlockerRulesBuilder
----
+
 ### Creating a ContentBlockerRulesBuilder
 ```swift
 init(trackerData: TrackerData)
@@ -85,8 +85,6 @@ do {
 
 let ruleList = String(data: data, encoding: .utf8)
 ```
-
----
 
 ## License
 

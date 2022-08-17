@@ -52,7 +52,9 @@ init(trackerData: TrackerData)
 ### Building the rules
 
 ```swift
-func buildRules(withExceptions exceptions: [String]? = nil, andTemporaryUnprotectedDomains tempUnprotectedDomains: [String]? = nil, andTrackerAllowlist trackerAllowlist: [TrackerException] = []) -> [ContentBlockerRule]
+func buildRules(withExceptions exceptions: [String]? = nil,
+                andTemporaryUnprotectedDomains tempUnprotectedDomains: [String]? = nil,
+                andTrackerAllowlist trackerAllowlist: [TrackerException] = []) -> [ContentBlockerRule]
 ```
 &emsp; &emsp; Build all the rules for the given tracker data and list of exceptions.
 

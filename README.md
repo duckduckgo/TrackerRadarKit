@@ -34,7 +34,7 @@ We recommend the use of [Swift Package Manager](https://www.swift.org/package-ma
 ## How to block trackers
 
 
-In order to block content on the web view you need to [compile](https://developer.apple.com/documentation/webkit/wkcontentruleliststore/2902761-compilecontentrulelist/) a content rule list using  Apple's [WKContentRuleListStore](https://developer.apple.com/documentation/webkit/wkcontentruleliststore), then apply compiled rule list to [WKUserContentController](https://developer.apple.com/documentation/webkit/wkusercontentcontroller).
+In order to block content on the web view you need to [compile](https://developer.apple.com/documentation/webkit/wkcontentruleliststore/2902761-compilecontentrulelist/) a content rule list using  Apple's [WKContentRuleListStore](https://developer.apple.com/documentation/webkit/wkcontentruleliststore), then apply the compiled rule list to [WKUserContentController](https://developer.apple.com/documentation/webkit/wkusercontentcontroller).
 
 TrackerRadarKit allows you to generate this list using DuckDuckGo's [Tracker Radar](https://github.com/duckduckgo/tracker-radar) as source.
 The main structs you'll need to use to create a content rule lists are:

@@ -139,10 +139,9 @@ public struct ContentBlockerRule: Codable, Hashable {
 
     private func unlessDomain(_ domains: [String]?, pageUrl: URL) -> Bool {
         guard let domains = domains else { return true }
-        for pageDomain in pageUrl.hostVariations ?? [] {
-            if domains.contains(where: { $0 == pageDomain || $0 == "*" + pageDomain }) {
-                return false
-            }
+        guard let pageDomains = pageUrl.hostVariations else { return true }
+        for pageDomain in pageDomains where domains.contains(where: { $0 == pageDomain || $0 == "*" + pageDomain }) {
+            return false
         }
         return true
     }
@@ -155,10 +154,9 @@ public struct ContentBlockerRule: Codable, Hashable {
 
     private func ifDomain(_ domains: [String]?, pageUrl: URL) -> Bool {
         guard let domains = domains else { return true }
-        for pageDomain in pageUrl.hostVariations ?? [] {
-            if domains.contains(where: { $0 == pageDomain || $0 == "*" + pageDomain }) {
-                return true
-            }
+        guard let pageDomains = pageUrl.hostVariations else { return false }
+        for pageDomain in pageDomains where domains.contains(where: { $0 == pageDomain || $0 == "*" + pageDomain }) {
+            return true
         }
         return false
     }

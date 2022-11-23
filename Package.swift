@@ -28,7 +28,7 @@ let package = Package(
             targets: ["TrackerRadarKit"])
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "0.4.3")
+        .package(url: "https://github.com/apple/swift-argument-parser.git", .upToNextMinor(from: "1.2.0"))
     ],
     targets: [
         .target(

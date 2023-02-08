@@ -47,6 +47,23 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         }
     }
 
+    func testLoadingUnsupportedRules() throws {
+        let data = JSONTestDataLoader.mockTrackerData
+        guard let mockData = try? JSONDecoder().decode(TrackerData.self, from: data) else {
+            XCTFail("Failed to decode tracker data")
+            return
+        }
+
+        guard let tracker = mockData.findTracker(byCname: "tracker-4.com") else {
+            XCTFail("Failed to find tracker")
+            return
+
+        }
+
+        let expectedNumberOfRules = 1
+        XCTAssertEqual(tracker.rules?.count, expectedNumberOfRules)
+    }
+
     func testLoadingRulesIsDeterministic() {
         let firstGeneration = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(
             withExceptions: [],

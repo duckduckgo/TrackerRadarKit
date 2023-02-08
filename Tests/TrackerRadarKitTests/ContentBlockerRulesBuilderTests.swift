@@ -57,7 +57,6 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         guard let tracker = mockData.findTracker(byCname: "tracker-4.com") else {
             XCTFail("Failed to find tracker")
             return
-
         }
 
         let expectedNumberOfRules = 1

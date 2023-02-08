@@ -63,6 +63,13 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         XCTAssertEqual(tracker.rules?.count, expectedNumberOfRules)
     }
 
+    func testTrackerDataParserPerformance () {
+        let data = JSONTestDataLoader.trackerData
+        measure {
+            _ = try? JSONDecoder().decode(TrackerData.self, from: data)
+        }
+    }
+
     func testLoadingRulesIsDeterministic() {
         let firstGeneration = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(
             withExceptions: [],

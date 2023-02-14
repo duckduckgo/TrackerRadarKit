@@ -174,6 +174,18 @@ public struct KnownTracker: Codable, Equatable {
         self.rules = rules
     }
 
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        domain = try? container.decode(String.self, forKey: .domain)
+        defaultAction = try? container.decode(KnownTracker.ActionType.self, forKey: .defaultAction)
+        owner = try? container.decode(KnownTracker.Owner.self, forKey: .owner)
+        prevalence = try? container.decode(Double.self, forKey: .prevalence)
+        subdomains = try? container.decode([String]?.self, forKey: .subdomains)
+        categories = try? container.decode([String].self, forKey: .categories)
+
+        let customRules = try? container.decode([OptionalValue<KnownTracker.Rule>].self, forKey: .rules)
+        rules = customRules?.compactMap { $0.value } as? [KnownTracker.Rule]
+    }
 }
 
 extension KnownTracker {
@@ -204,4 +216,17 @@ public struct Entity: Codable, Hashable {
         self.prevalence = prevalence
     }
     
+}
+
+private struct OptionalValue<Value: Decodable>: Decodable {
+    public let value: Value?
+
+    public init(from decoder: Decoder) throws {
+        do {
+            let container = try decoder.singleValueContainer()
+            self.value = try container.decode(Value.self)
+        } catch {
+            self.value = nil
+        }
+    }
 }

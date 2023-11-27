@@ -45,11 +45,17 @@ public struct ContentBlockerRule: Codable, Hashable {
             
         }
 
+        public enum LoadContext: String, Codable {
+            case topFrame = "top-frame"
+            case childFrame = "child-frame"
+        }
+
         let urlFilter: String
         let unlessDomain: [String]?
         let ifDomain: [String]?
         let resourceType: [ResourceType]?
         let loadType: [LoadType]?
+        let loadContext: [LoadContext]?
 
         enum CodingKeys: String, CodingKey {
             case urlFilter = "url-filter"
@@ -57,40 +63,50 @@ public struct ContentBlockerRule: Codable, Hashable {
             case ifDomain = "if-domain"
             case resourceType = "resource-type"
             case loadType = "load-type"
+            case loadContext = "load-context"
         }
 
-        private init(urlFilter: String, unlessDomain: [String]?, ifDomain: [String]?, resourceType: [ResourceType]?, loadType: [LoadType]?) {
+        private init(urlFilter: String, unlessDomain: [String]?, ifDomain: [String]?, resourceType: [ResourceType]?, loadType: [LoadType]?, loadContext: [LoadContext]?) {
             self.urlFilter = urlFilter
             self.unlessDomain = unlessDomain
             self.ifDomain = ifDomain
             self.resourceType = resourceType
             self.loadType = loadType
+            self.loadContext = loadContext
         }
 
         public static func trigger(onDomain domain: String) -> Trigger {
             return Trigger(urlFilter: ContentBlockerRulesBuilder.Constants.subDomainPrefix
                            + domain.replacingOccurrences(of: ".", with: "\\.")
                            + ContentBlockerRulesBuilder.Constants.domainMatchSuffix,
-                           unlessDomain: nil, ifDomain: nil, resourceType: nil, loadType: nil)
+                           unlessDomain: nil, ifDomain: nil, resourceType: nil, loadType: nil, loadContext: nil)
         }
 
         public static func trigger(urlFilter filter: String, loadTypes: [LoadType]? = [ .thirdParty ]) -> Trigger {
-            return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: nil, resourceType: nil, loadType: loadTypes)
+            return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: nil, resourceType: nil, loadType: loadTypes, loadContext: nil)
         }
         
         public static func trigger(urlFilter filter: String, unlessDomain urls: [String]?, loadTypes: [LoadType]? = [ .thirdParty ] ) -> Trigger {
-            return Trigger(urlFilter: filter, unlessDomain: urls, ifDomain: nil, resourceType: nil, loadType: loadTypes)
+            return Trigger(urlFilter: filter, unlessDomain: urls, ifDomain: nil, resourceType: nil, loadType: loadTypes, loadContext: nil)
         }
 
         public static func trigger(urlFilter filter: String, ifDomain domains: [String]?, resourceType types: [ResourceType]?) -> Trigger {
-            return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: domains, resourceType: types, loadType: [ .thirdParty ])
+            return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: domains, resourceType: types, loadType: [ .thirdParty ], loadContext: nil)
         }
         
         public static func trigger(urlFilter filter: String,
                                    ifDomain domains: [String]?,
                                    resourceType types: [ResourceType]?,
                                    loadTypes: [LoadType]? = [ .thirdParty ]) -> Trigger {
-            return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: domains, resourceType: types, loadType: loadTypes)
+            return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: domains, resourceType: types, loadType: loadTypes, loadContext: nil)
+        }
+        
+        public static func trigger(urlFilter filter: String,
+                                   ifDomain domains: [String]?,
+                                   resourceType types: [ResourceType]?,
+                                   loadTypes: [LoadType]? = [ .thirdParty ],
+                                   loadContext: [LoadContext]? = nil) -> Trigger {
+            return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: domains, resourceType: types, loadType: loadTypes, loadContext: loadContext)
         }
     }
 

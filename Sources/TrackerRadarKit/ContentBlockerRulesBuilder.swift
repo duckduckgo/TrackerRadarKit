@@ -167,7 +167,8 @@ public struct ContentBlockerRulesBuilder {
             ]
         } else if r.options == nil && r.exceptions == nil {
             return [
-                block(r, withOwner: tracker.owner, loadTypes: loadTypes)
+                block(r, withOwner: tracker.owner, loadTypes: loadTypes),
+                ignorePrevious(r, resourceTypes: [.popup], loadTypes: loadTypes, loadContext: [.topFrame])
             ]
         } else if r.exceptions != nil && r.options != nil {
             return [
@@ -245,7 +246,18 @@ public struct ContentBlockerRulesBuilder {
                                                     loadTypes: loadTypes),
                                   action: .ignorePreviousRules())
     }
-    
+
+    private func ignorePrevious(_ rule: KnownTracker.Rule, matching: KnownTracker.Rule.Matching? = nil,
+                                resourceTypes: [ContentBlockerRule.Trigger.ResourceType], loadTypes: [ContentBlockerRule.Trigger.LoadType],
+                                loadContext: [ContentBlockerRule.Trigger.LoadContext]) -> ContentBlockerRule {
+        return ContentBlockerRule(trigger: .trigger(urlFilter: rule.normalizedRule(),
+                                                    ifDomain: matching?.domains?.prefixAll(with: "*"),
+                                                    resourceType: resourceTypes,
+                                                    loadTypes: loadTypes,
+                                                    loadContext: loadContext),
+                                  action: .ignorePreviousRules())
+    }
+
 }
 
 fileprivate extension String {

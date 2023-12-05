@@ -51,7 +51,9 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         let rules = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(withExceptions: ["duckduckgo.com"],
         andTemporaryUnprotectedDomains: [])
 
-        if let idx = rules.firstIndexOfExactFilter(filter: "^(https?)?(wss?)?://([a-z0-9-]+\\.)*xvideos-cdn\\.com\\/v-c19d94e7937\\/v3\\/js\\/skins\\/min\\/default\\.header\\.static\\.js") {
+        // swiftlint:disable:next line_length
+        let domainFilter = "^(https?)?(wss?)?://([a-z0-9-]+\\.)*xvideos-cdn\\.com\\/v-c19d94e7937\\/v3\\/js\\/skins\\/min\\/default\\.header\\.static\\.js"
+        if let idx = rules.firstIndexOfExactFilter(filter: domainFilter) {
             let nextRule = rules[idx + 1]
             XCTAssertNotNil(nextRule, "Missing ignore-previous popup type rule")
             XCTAssert(nextRule.action == .ignorePreviousRules())

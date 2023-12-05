@@ -66,7 +66,8 @@ public struct ContentBlockerRule: Codable, Hashable {
             case loadContext = "load-context"
         }
 
-        private init(urlFilter: String, unlessDomain: [String]?, ifDomain: [String]?, resourceType: [ResourceType]?, loadType: [LoadType]?, loadContext: [LoadContext]?) {
+        private init(urlFilter: String, unlessDomain: [String]?, ifDomain: [String]?, 
+                     resourceType: [ResourceType]?, loadType: [LoadType]?, loadContext: [LoadContext]?) {
             self.urlFilter = urlFilter
             self.unlessDomain = unlessDomain
             self.ifDomain = ifDomain
@@ -106,7 +107,8 @@ public struct ContentBlockerRule: Codable, Hashable {
                                    resourceType types: [ResourceType]?,
                                    loadTypes: [LoadType]? = [ .thirdParty ],
                                    loadContext: [LoadContext]? = nil) -> Trigger {
-            return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: domains, resourceType: types, loadType: loadTypes, loadContext: loadContext)
+            return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: domains,
+                           resourceType: types, loadType: loadTypes, loadContext: loadContext)
         }
     }
 

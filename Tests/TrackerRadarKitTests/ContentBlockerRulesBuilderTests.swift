@@ -47,6 +47,21 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         }
     }
 
+    func testDefaultIgnoreGeneratesPopupIgnoreRules() throws {
+        let rules = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(withExceptions: ["duckduckgo.com"],
+        andTemporaryUnprotectedDomains: [])
+
+        if let idx = rules.firstIndexOfExactFilter(filter: "^(https?)?(wss?)?://([a-z0-9-]+\\.)*xvideos-cdn\\.com\\/v-c19d94e7937\\/v3\\/js\\/skins\\/min\\/default\\.header\\.static\\.js") {
+            let nextRule = rules[idx + 1]
+            XCTAssertNotNil(nextRule, "Missing ignore-previous popup type rule")
+            XCTAssert(nextRule.action == .ignorePreviousRules())
+            XCTAssert(nextRule.trigger.loadContext?.first == .topFrame)
+            XCTAssert(nextRule.trigger.resourceType?.first == .popup)
+        } else {
+            XCTFail("Missing rule for testing")
+        }
+    }
+
     func testLoadingUnsupportedRules() throws {
         let data = JSONTestDataLoader.mockTrackerData
         guard let mockData = try? JSONDecoder().decode(TrackerData.self, from: data) else {

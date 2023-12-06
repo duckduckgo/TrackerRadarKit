@@ -35,4 +35,8 @@ extension Array where Element == ContentBlockerRule {
 
         return nil
     }
+
+    func firstIndexOfExactFilter(filter: String) -> Int? {
+        self.firstIndex { $0.trigger.urlFilter == filter }
+    }
 }

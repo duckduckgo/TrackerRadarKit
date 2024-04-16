@@ -22,25 +22,15 @@ import PackageDescription
 let package = Package(
     name: "TrackerRadarKit",
     products: [
-        .executable(name: "validator", targets: ["Validator"]),
         .library(
             name: "TrackerRadarKit",
             targets: ["TrackerRadarKit"])
     ],
-    dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.2.1")
-    ],
+    dependencies: [],
     targets: [
         .target(
             name: "TrackerRadarKit",
             dependencies: []),
-        .target(
-            name: "Validator",
-            dependencies:
-                [
-                    "TrackerRadarKit",
-                    .product(name: "ArgumentParser", package: "swift-argument-parser")
-                ]),
         .testTarget(
             name: "TrackerRadarKitTests",
             dependencies: ["TrackerRadarKit"],

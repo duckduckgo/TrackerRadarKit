@@ -127,6 +127,7 @@ public struct KnownTracker: Codable, Equatable {
     public enum ActionType: String, Codable {
         case block
         case ignore
+        // blockCtlFB is treated as "block" for rule creation logic
         case blockCtlFB = "block-ctl-fb"
     }
     

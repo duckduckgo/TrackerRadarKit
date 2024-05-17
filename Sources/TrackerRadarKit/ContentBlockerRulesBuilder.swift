@@ -145,7 +145,13 @@ public struct ContentBlockerRulesBuilder {
         return [ ContentBlockerRule(trigger: .trigger(urlFilter: urlFilter,
                                                       unlessDomain: trackerData.relatedDomains(for: tracker.owner)?.wildcards(),
                                                       loadTypes: loadTypes),
-                                    action: .block()) ]        
+                                    action: .block()),
+                 ContentBlockerRule(trigger: .trigger(urlFilter: urlFilter,
+                                                      resourceType: [.popup],
+                                                      loadTypes: loadTypes,
+                                                      loadContext: [.topFrame]),
+                                    action: .ignorePreviousRules())
+        ]
     }
 
     private func buildRules(fromRule r: KnownTracker.Rule,

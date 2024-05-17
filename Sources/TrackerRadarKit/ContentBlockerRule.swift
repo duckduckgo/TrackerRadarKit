@@ -91,6 +91,10 @@ public struct ContentBlockerRule: Codable, Hashable {
             return Trigger(urlFilter: filter, unlessDomain: urls, ifDomain: nil, resourceType: nil, loadType: loadTypes, loadContext: nil)
         }
 
+        public static func trigger(urlFilter filter: String, resourceType types: [ResourceType]?, loadTypes: [LoadType]?, loadContext: [LoadContext]?) -> Trigger {
+            return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: nil, resourceType: types, loadType: loadTypes, loadContext: loadContext)
+        }
+
         public static func trigger(urlFilter filter: String, ifDomain domains: [String]?, resourceType types: [ResourceType]?) -> Trigger {
             return Trigger(urlFilter: filter, unlessDomain: nil, ifDomain: domains, resourceType: types, loadType: [ .thirdParty ], loadContext: nil)
         }

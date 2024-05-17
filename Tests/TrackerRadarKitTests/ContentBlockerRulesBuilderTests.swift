@@ -52,7 +52,7 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         andTemporaryUnprotectedDomains: [])
 
         // swiftlint:disable:next line_length
-        let domainFilter = "^(https?)?(wss?)?://([a-z0-9-]+\\.)*xvideos-cdn\\.com\\/v-c19d94e7937\\/v3\\/js\\/skins\\/min\\/default\\.header\\.static\\.js"
+        var domainFilter = "^(https?)?(wss?)?://([a-z0-9-]+\\.)*xvideos-cdn\\.com\\/v-c19d94e7937\\/v3\\/js\\/skins\\/min\\/default\\.header\\.static\\.js"
         if let idx = rules.firstIndexOfExactFilter(filter: domainFilter) {
             let nextRule = rules[idx + 1]
             XCTAssertNotNil(nextRule, "Missing ignore-previous popup type rule")
@@ -62,6 +62,19 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         } else {
             XCTFail("Missing rule for testing")
         }
+
+        // Test top level default block rule
+        domainFilter = "^(https?)?(wss?)?://([a-z0-9-]+\\.)*google-analytics\\.com(:?[0-9]+)?/.*"
+        if let idx = rules.firstIndexOfExactFilter(filter: domainFilter) {
+            let nextRule = rules[idx + 1]
+            XCTAssertNotNil(nextRule, "Missing ignore-previous popup type rule")
+            XCTAssert(nextRule.action == .ignorePreviousRules())
+            XCTAssert(nextRule.trigger.loadContext?.first == .topFrame)
+            XCTAssert(nextRule.trigger.resourceType?.first == .popup)
+        } else {
+            XCTFail("Missing rule for testing")
+        }
+
     }
 
     func testLoadingUnsupportedRules() throws {

@@ -28,6 +28,14 @@ class JSONTestDataLoader {
         JSONTestDataLoader().fromJSONFile("mockTrackerData")
     }
 
+    static var trackerDataWithCPM: Data {
+        JSONTestDataLoader().fromJSONFile("cpm_tds")
+    }
+
+    static var trackerDataWithoutCPM: Data {
+        JSONTestDataLoader().fromJSONFile("no_cpm_tds")
+    }
+
     private var bundle: Bundle {
         Bundle.module
     }

@@ -25,24 +25,25 @@ public struct TrackerData: Codable, Equatable {
     public typealias CnameDomain = String
 
     public struct TrackerRules {
-        
         let tracker: KnownTracker
-        
     }
     
     public let trackers: [TrackerDomain: KnownTracker]
     public let entities: [EntityName: Entity]
     public let domains: [TrackerDomain: EntityName]
     public let cnames: [CnameDomain: TrackerDomain]?
-    
+    public let cpm: Cpm?
+
     public init(trackers: [String: KnownTracker],
                 entities: [String: Entity],
                 domains: [String: String],
-                cnames: [String: String]?) {
+                cnames: [String: String]?,
+                cpm: Cpm?) {
         self.trackers = trackers
         self.entities = entities
         self.domains = domains
         self.cnames = cnames
+        self.cpm = cpm
     }
 
     public func relatedDomains(for owner: KnownTracker.Owner?) -> [String]? {
@@ -67,6 +68,7 @@ public struct TrackerData: Codable, Equatable {
         case entities
         case domains
         case cnames
+        case cpm
     }
     
 }
@@ -218,6 +220,17 @@ public struct Entity: Codable, Hashable {
         self.prevalence = prevalence
     }
     
+}
+
+public struct Cpm: Codable, Hashable {
+
+    /// JS Blob containing the EasyList for https://app.asana.com/0/72649045549333/1203546593974327/f
+    public let filterList: String
+
+    public init(filterList: String) {
+        self.filterList = filterList
+    }
+
 }
 
 private struct OptionalValue<Value: Decodable>: Decodable {

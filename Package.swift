@@ -36,7 +36,9 @@ let package = Package(
             dependencies: ["TrackerRadarKit"],
             resources: [
                 .process("Resources/trackerData.json"),
-                .process("Resources/mockTrackerData.json")
+                .process("Resources/mockTrackerData.json"),
+                .process("Resources/no_cpm_tds.json"),
+                .process("Resources/cpm_tds.json")
             ])
     ]
 )

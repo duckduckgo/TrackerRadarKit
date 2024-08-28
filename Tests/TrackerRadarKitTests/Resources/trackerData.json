@@ -12875,10 +12875,10 @@
         "instagram.com": {
             "domain": "instagram.com",
             "owner": {
-                "name": "Facebook, Inc.",
-                "displayName": "Facebook",
-                "privacyPolicy": "https://help.instagram.com/402411646841720",
-                "url": "http://instagram.com"
+                "name": "Instagram",
+                "displayName": "Instagram (Facebook)",
+                "localizedName": "Instagram",
+                "ownedBy": "Facebook, Inc."
             },
             "prevalence": 0.00754,
             "fingerprinting": 2,
@@ -29324,6 +29324,24 @@
                     "cookies": 0.0000152
                 }
             ]
+        },
+        "youtube.com": {
+            "domain": "youtube.com",
+            "owner": {
+                "name": "Youtube",
+                "displayName": "Youtube (Google)",
+                "localizedName": "Youtube",
+                "ownedBy": "Google LLC"
+            },
+            "prevalence": 0.0694,
+            "fingerprinting": 3,
+            "cookies": 0.0628,
+            "categories": [
+                "Ad Motivated Tracking",
+                "Content Delivery",
+                "Embedded Content"
+            ],
+            "default": "ignore"
         },
         "zadn.vn": {
             "domain": "zadn.vn",

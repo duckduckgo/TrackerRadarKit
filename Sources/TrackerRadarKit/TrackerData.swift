@@ -81,10 +81,12 @@ public struct KnownTracker: Codable, Equatable {
         
         public let name: String?
         public let displayName: String?
+        public let ownedBy: String?
 
-        public init(name: String?, displayName: String?) {
+        public init(name: String?, displayName: String?, ownedBy: String?) {
             self.name = name
             self.displayName = displayName
+            self.ownedBy = ownedBy
         }
     
     }

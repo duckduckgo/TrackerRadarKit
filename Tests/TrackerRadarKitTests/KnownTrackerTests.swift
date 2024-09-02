@@ -45,4 +45,30 @@ class KnownTrackerTests: XCTestCase {
         XCTAssertNil(tracker.category)
     }
 
+    func testWhenTrackerIsOwnedByParentThenOwnedByIsNotEmpty() throws {
+        // GIVEN
+        let trackerData = try JSONDecoder().decode(TrackerData.self, from: JSONTestDataLoader.trackerData)
+
+        // WHEN
+        var owner = trackerData.trackers["instagram.com"]?.owner
+        // THEN assert Instagram is owned by Facebook
+        XCTAssertEqual(owner?.ownedBy, "Facebook, Inc.")
+
+        // WHEN
+        owner = trackerData.trackers["youtube.com"]?.owner
+        // Assert Youtube.com is owned by Google
+        XCTAssertEqual(owner?.ownedBy, "Google LLC")
+    }
+
+    func testWhenTrackerIsNotOwnedByParentThenOwnedByIsEmpty() throws {
+        // GIVEN
+        let trackerData = try JSONDecoder().decode(TrackerData.self, from: JSONTestDataLoader.trackerData)
+
+        // WHEN
+        let owner = try XCTUnwrap(trackerData.trackers["insightexpressai.com"]).owner
+
+        // THEN
+        XCTAssertNil(owner?.ownedBy)
+    }
+
 }

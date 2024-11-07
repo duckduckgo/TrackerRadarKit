@@ -37,6 +37,9 @@ let package = Package(
             resources: [
                 .process("Resources/trackerData.json"),
                 .process("Resources/mockTrackerData.json")
-            ])
+            ]),
+        .testTarget(
+            name: "TrackerRadarKitPerformanceTests",
+            dependencies: ["TrackerRadarKit"])
     ]
 )

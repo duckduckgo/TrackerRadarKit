@@ -2,26 +2,8 @@ name: TDS Compilation Performance Test
 
 on:
   push:
-    branches: 
-        - '*' # all branches
+
   workflow_dispatch:
-    inputs:
-      init_baseline:
-        description: 'Initialize baseline'
-        required: false
-        default: 'false'
-      test_vs_baseline:
-        description: 'Test against baseline'
-        required: false
-        default: 'true'
-      tds_file_name:
-        description: 'TDS file name'
-        required: false
-        default: 'ios-tds.json'
-      use_tds_dev_url:
-        description: 'Use TDS dev URL'
-        required: false
-        default: 'false'
 
 jobs:
   performance-test:
@@ -50,13 +32,3 @@ jobs:
           -destination 'platform=macOS' \
           -only-testing:TrackerRadarKitPerformanceTests/NextTrackerDataSetPerformanceTests \
           -destination 'platform=macOS' 
-#          INIT_BASELINE=$INIT_BASELINE \
-#          TEST_VS_BASELINE=$TEST_VS_BASELINE \
-#          TDS_FILE_NAME=$TDS_FILE_NAME \
-#          TDS_URL=$TDS_URL
-
-#    - name: Upload baseline file
-#      uses: actions/upload-artifact@v2
-#      with:
-#        name: performance-baseline
-#        path: compilationTimeBaseline.json

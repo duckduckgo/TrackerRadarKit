@@ -1,0 +1,62 @@
+name: TDS Compilation Performance Test
+
+on:
+  push:
+    branches: 
+        - '*' # all branches
+  workflow_dispatch:
+    inputs:
+      init_baseline:
+        description: 'Initialize baseline'
+        required: false
+        default: 'false'
+      test_vs_baseline:
+        description: 'Test against baseline'
+        required: false
+        default: 'true'
+      tds_file_name:
+        description: 'TDS file name'
+        required: false
+        default: 'ios-tds.json'
+      use_tds_dev_url:
+        description: 'Use TDS dev URL'
+        required: false
+        default: 'false'
+
+jobs:
+  performance-test:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode.app
+
+    - name: Build for testing
+      run: |
+        xcodebuild build-for-testing \
+          -scheme TrackerRadarKit \
+          -destination 'platform=macOS'
+
+    - name: Run performance test
+      env:
+        INIT_BASELINE: ${{ github.event.inputs.init_baseline || 'false' }}
+        TEST_VS_BASELINE: ${{ github.event.inputs.test_vs_baseline || 'true' }}
+        TDS_FILE_NAME: ${{ github.event.inputs.tds_file_name || 'ios-tds.json' }}
+        USE_TDS_DEV_URL: ${{ github.event.inputs.use_tds_dev_url || 'false' }}
+      run: |
+        xcodebuild test-without-building \
+          -scheme TrackerRadarKit \
+          -destination 'platform=macOS' \
+          -only-testing:TrackerRadarKitPerformanceTests/NextTrackerDataSetPerformanceTests \
+          -destination 'platform=macOS' 
+#          INIT_BASELINE=$INIT_BASELINE \
+#          TEST_VS_BASELINE=$TEST_VS_BASELINE \
+#          TDS_FILE_NAME=$TDS_FILE_NAME \
+#          TDS_URL=$TDS_URL
+
+#    - name: Upload baseline file
+#      uses: actions/upload-artifact@v2
+#      with:
+#        name: performance-baseline
+#        path: compilationTimeBaseline.json

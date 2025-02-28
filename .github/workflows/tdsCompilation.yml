@@ -27,8 +27,12 @@ jobs:
         TDS_FILE_NAME: ${{ github.event.inputs.tds_file_name || 'ios-tds.json' }}
         USE_TDS_DEV_URL: ${{ github.event.inputs.use_tds_dev_url || 'false' }}
       run: |
-        xcodebuild test-without-building \
-          -scheme TrackerRadarKit \
-          -destination 'platform=macOS' \
-          -only-testing:TrackerRadarKitPerformanceTests/NextTrackerDataSetPerformanceTests \
-          -destination 'platform=macOS' 
+        for i in {1..10}
+        do
+          echo "Running performance test iteration $i"
+          xcodebuild test-without-building \
+            -scheme TrackerRadarKit \
+            -destination 'platform=macOS' \
+            -only-testing:TrackerRadarKitPerformanceTests/NextTrackerDataSetPerformanceTests \
+            -destination 'platform=macOS'
+        done

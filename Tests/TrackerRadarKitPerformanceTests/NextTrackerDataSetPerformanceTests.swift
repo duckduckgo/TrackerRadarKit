@@ -23,12 +23,15 @@ import WebKit
 
 class NextTrackerDataSetPerformanceTests: XCTestCase {
     
-    var nextiOSTDS: TrackerData!
+    var utTDS: TrackerData!
+    var refTDS: TrackerData?
         
     var maxPercentRegression: Double = 0.05 // 5% by default
 
-    var tdsFileName: String = "ios-tds.json"
-    var tdsDevURL: String = "https://staticcdn.duckduckgo.com/trackerblocking/v5/next/"
+    var tdsUtFileName: String = "ios-tds.json"
+    var tdsUtURL: String = "https://staticcdn.duckduckgo.com/trackerblocking/v5/next/"
+    var tdsRefFileName: String?
+    var tdsRefURL: String?
     
     let numberOfRuns = 10
     let numberOfIterationsPerRun = 1
@@ -43,37 +46,53 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         
         try loadParameters()
         
-        let (data, _) = try await URLSession.shared.data(from: nextURL(filename: tdsFileName, fileURL: tdsDevURL))
+        let (data, _) = try await URLSession.shared.data(from: nextURL(filename: tdsUtFileName, fileURL: tdsUtURL))
+        utTDS = try JSONDecoder().decode(TrackerData.self, from: data)
         
-        nextiOSTDS = try JSONDecoder().decode(TrackerData.self, from: data)
+        if let refFileName = tdsRefFileName, let refURL = tdsRefURL {
+            let (refData, _) = try await URLSession.shared.data(from: nextURL(filename: refFileName, fileURL: refURL))
+            refTDS = try JSONDecoder().decode(TrackerData.self, from: refData)
+        }
         
-        print("Next TDS prepared")
+        print("TDS files prepared")
     }
     
     func testPerformanceOfNext_iOSTDS() throws {
-        var allAverages: [TimeInterval] = []
+        let utAverage = try runPerformanceTest(tds: utTDS, name: "UT TDS")
+        
+        if let refTDS = refTDS {
+            let refAverage = try runPerformanceTest(tds: refTDS, name: "Reference TDS")
             
-        // Perform multiple runs outside of the measure block
-        for run in 1...numberOfRuns {
-            let average = try performSingleRun(run: run, numberOfIterations: numberOfIterationsPerRun)
-            allAverages.append(average)
+            let percentDifference = (utAverage - refAverage) / refAverage
+            print("Percent difference: \(percentDifference * 100)%")
+            
+            XCTAssertLessThanOrEqual(percentDifference, maxPercentRegression, "UT TDS performance regression exceeds allowed threshold")
         }
-            
-        // Calculate and print the final average
-        let finalAverage = calculateFinalAverage(allAverages)
-        print("Final average (30-70 percentile): \(finalAverage)")
-            
+        
         // Perform one last run inside measure block for XCTest metrics
         measure {
-            let _ = try? performSingleRun(run: numberOfRuns + 1, numberOfIterations: 1)
+            let _ = try? performSingleRun(tds: utTDS, run: numberOfRuns + 1, numberOfIterations: 1, name: "")
         }
-            
-        // You can add assertions here if needed
-        // XCTAssertLessThanOrEqual(finalAverage, someThreshold)
+    }
+        
+    func runPerformanceTest(tds: TrackerData, name: String) throws -> TimeInterval {
+        var allAverages: [TimeInterval] = []
+        
+        // Perform multiple runs outside of the measure block
+        for run in 1...numberOfRuns {
+            let average = try performSingleRun(tds: tds, run: run, numberOfIterations: numberOfIterationsPerRun, name: name)
+            allAverages.append(average)
         }
+        
+        // Calculate and print the final average
+        let finalAverage = calculateFinalAverage(allAverages)
+        print("Final average for \(name) (30-70 percentile): \(finalAverage)")
+        
+        return finalAverage
+    }
     
-    func performSingleRun(run: Int, numberOfIterations: Int) throws -> TimeInterval {
-        let rules = ContentBlockerRulesBuilder(trackerData: nextiOSTDS).buildRules()
+    func performSingleRun(tds: TrackerData, run: Int, numberOfIterations: Int, name: String) throws -> TimeInterval {
+        let rules = ContentBlockerRulesBuilder(trackerData: tds).buildRules()
         
         let data = try JSONEncoder().encode(rules)
         let ruleList = String(data: data, encoding: .utf8)!
@@ -97,7 +116,7 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
             wait(for: [expectation], timeout: 40)
             
             let executionTime = CACurrentMediaTime() - time
-            print("Run \(run), Iteration \(iteration): Compiled in \(executionTime)")
+            print("\(name) - Run \(run), Iteration \(iteration): Compiled in \(executionTime)")
             totalTime += executionTime
         }
         
@@ -115,12 +134,12 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
     }
     
     func loadParameters() throws {
-        if let envTdsFileName = ProcessInfo.processInfo.environment["TDS_FILE_NAME"] {
-            tdsFileName = envTdsFileName
+        if let envTdsFileName = ProcessInfo.processInfo.environment["TDS_UT_FILE_NAME"] {
+            tdsUtFileName = envTdsFileName
         }
         
-        if let envTdsUrl = ProcessInfo.processInfo.environment["TDS_URL"] {
-            tdsDevURL = envTdsUrl
+        if let envTdsUrl = ProcessInfo.processInfo.environment["TDS_UT_URL"] {
+            tdsUtURL = envTdsUrl
         }
     }
 }

@@ -147,7 +147,7 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         }
         
         if let envRefTdsUrl = ProcessInfo.processInfo.environment["TDS_REF_URL"] {
-            tdsRefURL = envTdsUrl
+            tdsRefURL = envRefTdsUrl
         }
     }
 }

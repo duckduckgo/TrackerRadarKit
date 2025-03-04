@@ -4,6 +4,13 @@ on:
   push:
 
   workflow_dispatch:
+    inputs:
+      ios_s3_url:
+        description: 'Full HTTPS or S3 URL of the iOS TrackerData file location'
+        required: true
+      macos_s3_url:
+        description: 'Full HTTPS or S3 URL of the macOS TrackerData file location'
+        required: true
 
 jobs:
   performance-test:
@@ -22,10 +29,8 @@ jobs:
 
     - name: Run performance test
       env:
-        INIT_BASELINE: ${{ github.event.inputs.init_baseline || 'false' }}
-        TEST_VS_BASELINE: ${{ github.event.inputs.test_vs_baseline || 'true' }}
-        TDS_FILE_NAME: ${{ github.event.inputs.tds_file_name || 'ios-tds.json' }}
-        USE_TDS_DEV_URL: ${{ github.event.inputs.use_tds_dev_url || 'false' }}
+        IOS_TDS_URL: ${{ inputs.ios_s3_url }}
+        MACOS_TDS_URL: ${{ inputs.macos_s3_url }}
       run: |
         for i in {1..10}
         do

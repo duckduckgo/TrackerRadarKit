@@ -141,5 +141,16 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         if let envTdsUrl = ProcessInfo.processInfo.environment["TDS_UT_URL"] {
             tdsUtURL = envTdsUrl
         }
+        
+        if let envRefTdsFileName = ProcessInfo.processInfo.environment["TDS_REF_FILE_NAME"] {
+            tdsRefFileName = envRefTdsFileName
+        }
+        
+        if let envRefTdsUrl = ProcessInfo.processInfo.environment["TDS_REF_URL"] {
+            tdsRefURL = envTdsUrl
+        }
+        
+        tdsRefFileName = "ios-tds.json"
+        tdsRefURL = "https://staticcdn.duckduckgo.com/trackerblocking/v5/current/"
     }
 }

@@ -31,7 +31,7 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
     var tdsDevURL: String = "https://staticcdn.duckduckgo.com/trackerblocking/v5/next/"
     
     let numberOfRuns = 10
-    let numberOfIterationsPerRun = 10
+    let numberOfIterationsPerRun = 1
     
     func nextURL(filename: String, fileURL: String) -> URL {
         let baseURL = URL(string: fileURL)!

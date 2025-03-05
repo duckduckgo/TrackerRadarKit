@@ -54,7 +54,7 @@ jobs:
     - name: Run performance test (iOS)
       run: |
         env TEST_RUNNER_TDS_UT_FILE_NAME=trackerData-admiral.json \
-            TEST_RUNNER_TDS_UT_URL=$(pwd)/TestData/ \
+            TEST_RUNNER_TDS_UT_URL=file:///$(pwd)/TestData/ \
             TEST_RUNNER_TDS_REF_FILE_NAME=ios-tds.json \
             TEST_RUNNER_TDS_REF_URL=https://staticcdn.duckduckgo.com/trackerblocking/v5/current/ \
             xcodebuild test-without-building \
@@ -65,7 +65,7 @@ jobs:
     - name: Run performance test (macOS)
       run: |
         env TEST_RUNNER_TDS_UT_FILE_NAME=trackerData-admiral.json \
-            TEST_RUNNER_TDS_UT_URL=$(pwd)/TestData/ \
+            TEST_RUNNER_TDS_UT_URL=file:///$(pwd)/TestData/ \
             TEST_RUNNER_TDS_REF_FILE_NAME=https://staticcdn.duckduckgo.com/trackerblocking/v6/current/ \
             TEST_RUNNER_TDS_REF_URL=macos-tds.json \
             xcodebuild test-without-building \

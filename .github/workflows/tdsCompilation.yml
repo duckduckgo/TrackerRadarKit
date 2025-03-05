@@ -53,8 +53,8 @@ jobs:
 
     - name: Run performance test (iOS)
       run: |
-        env TEST_RUNNER_TDS_UT_FILE_NAME=trackerData-admiral.json \
-            TEST_RUNNER_TDS_UT_URL=file:///$(pwd)/TestData/ \
+        env TEST_RUNNER_TDS_UT_FILE_NAME=ios-tds.json \
+            TEST_RUNNER_TDS_UT_URL=https://staticcdn.duckduckgo.com/trackerblocking/v5/next/ \
             TEST_RUNNER_TDS_REF_FILE_NAME=ios-tds.json \
             TEST_RUNNER_TDS_REF_URL=https://staticcdn.duckduckgo.com/trackerblocking/v5/current/ \
             xcodebuild test-without-building \
@@ -64,10 +64,10 @@ jobs:
 
     - name: Run performance test (macOS)
       run: |
-        env TEST_RUNNER_TDS_UT_FILE_NAME=trackerData-admiral.json \
-            TEST_RUNNER_TDS_UT_URL=file:///$(pwd)/TestData/ \
-            TEST_RUNNER_TDS_REF_FILE_NAME=https://staticcdn.duckduckgo.com/trackerblocking/v6/current/ \
-            TEST_RUNNER_TDS_REF_URL=macos-tds.json \
+        env TEST_RUNNER_TDS_UT_FILE_NAME=macos-tds.json \
+            TEST_RUNNER_TDS_UT_URL=https://staticcdn.duckduckgo.com/trackerblocking/v6/next/ \
+            TEST_RUNNER_TDS_REF_FILE_NAME=macos-tds.json \
+            TEST_RUNNER_TDS_REF_URL=https://staticcdn.duckduckgo.com/trackerblocking/v6/current/ \
             xcodebuild test-without-building \
               -scheme TrackerRadarKit \
               -destination 'platform=macOS' \

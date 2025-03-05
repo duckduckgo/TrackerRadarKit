@@ -46,11 +46,17 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         
         try loadParameters()
         
-        let (data, _) = try await URLSession.shared.data(from: nextURL(filename: tdsUtFileName, fileURL: tdsUtURL))
+        let utTdsUrl = nextURL(filename: tdsUtFileName, fileURL: tdsUtURL)
+        print("TDS under Test: \(utTdsUrl.absoluteString)")
+        
+        let (data, _) = try await URLSession.shared.data(from: utTdsUrl)
         utTDS = try JSONDecoder().decode(TrackerData.self, from: data)
         
         if let refFileName = tdsRefFileName, let refURL = tdsRefURL {
-            let (refData, _) = try await URLSession.shared.data(from: nextURL(filename: refFileName, fileURL: refURL))
+            let refTdsUrl = nextURL(filename: refFileName, fileURL: refURL)
+            print("Reference TDS: \(refTdsUrl.absoluteString)")
+            
+            let (refData, _) = try await URLSession.shared.data(from: refTdsUrl)
             refTDS = try JSONDecoder().decode(TrackerData.self, from: refData)
         }
         

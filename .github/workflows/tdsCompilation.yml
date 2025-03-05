@@ -11,6 +11,30 @@ on:
       macos_s3_url:
         description: 'Full HTTPS or S3 URL of the macOS TrackerData file location'
         required: true
+      ios_ut_file_name:
+        description: 'iOS UT file name'
+        required: false
+        default: 'ios-tds.json'
+      ios_ref_file_name:
+        description: 'iOS reference file name'
+        required: false
+        default: 'ios-tds.json'
+      ios_ref_url:
+        description: 'iOS reference URL'
+        required: false
+        default: 'https://staticcdn.duckduckgo.com/trackerblocking/v5/current/'
+      macos_ut_file_name:
+        description: 'macOS UT file name'
+        required: false
+        default: 'macos-tds.json'
+      macos_ref_file_name:
+        description: 'macOS reference file name'
+        required: false
+        default: 'macos-tds.json'
+      macos_ref_url:
+        description: 'macOS reference URL'
+        required: false
+        default: 'https://staticcdn.duckduckgo.com/trackerblocking/v6/current/'
 
 jobs:
   performance-test:
@@ -29,10 +53,10 @@ jobs:
 
     - name: Run performance test (iOS)
       run: |
-        env TEST_RUNNER_TDS_UT_FILE_NAME=ios-tds.json \
+        env TEST_RUNNER_TDS_UT_FILE_NAME=${{ inputs.ios_ut_file_name }} \
             TEST_RUNNER_TDS_UT_URL=${{ inputs.ios_s3_url }} \
-            TEST_RUNNER_TDS_REF_FILE_NAME=ios-tds.json \
-            TEST_RUNNER_TDS_REF_URL=https://staticcdn.duckduckgo.com/trackerblocking/v5/current/ \
+            TEST_RUNNER_TDS_REF_FILE_NAME=${{ inputs.ios_ref_file_name }} \
+            TEST_RUNNER_TDS_REF_URL=${{ inputs.ios_ref_url }} \
             xcodebuild test-without-building \
               -scheme TrackerRadarKit \
               -destination 'platform=macOS' \
@@ -40,10 +64,10 @@ jobs:
 
     - name: Run performance test (macOS)
       run: |
-        env TEST_RUNNER_TDS_UT_FILE_NAME=macos-tds.json \
+        env TEST_RUNNER_TDS_UT_FILE_NAME=${{ inputs.ios_ref_url }} \
             TEST_RUNNER_TDS_UT_URL=${{ inputs.macos_s3_url }} \
-            TEST_RUNNER_TDS_REF_FILE_NAME=macos-tds.json \
-            TEST_RUNNER_TDS_REF_URL=https://staticcdn.duckduckgo.com/trackerblocking/v6/current/ \
+            TEST_RUNNER_TDS_REF_FILE_NAME=${{ inputs.macos_ref_file_name }} \
+            TEST_RUNNER_TDS_REF_URL=${{ inputs.macos_ref_url }} \
             xcodebuild test-without-building \
               -scheme TrackerRadarKit \
               -destination 'platform=macOS' \

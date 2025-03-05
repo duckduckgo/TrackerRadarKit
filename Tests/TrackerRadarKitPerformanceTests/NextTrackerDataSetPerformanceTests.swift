@@ -140,19 +140,19 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
     }
     
     func loadParameters() throws {
-        if let envTdsFileName = ProcessInfo.processInfo.environment["TDS_UT_FILE_NAME"] {
+        if let envTdsFileName = ProcessInfo.processInfo.environment["TDS_UT_FILE_NAME"], !envTdsFileName.isEmpty {
             tdsUtFileName = envTdsFileName
         }
         
-        if let envTdsUrl = ProcessInfo.processInfo.environment["TDS_UT_URL"] {
+        if let envTdsUrl = ProcessInfo.processInfo.environment["TDS_UT_URL"], !envTdsUrl.isEmpty {
             tdsUtURL = envTdsUrl
         }
         
-        if let envRefTdsFileName = ProcessInfo.processInfo.environment["TDS_REF_FILE_NAME"] {
+        if let envRefTdsFileName = ProcessInfo.processInfo.environment["TDS_REF_FILE_NAME"], !envRefTdsFileName.isEmpty {
             tdsRefFileName = envRefTdsFileName
         }
         
-        if let envRefTdsUrl = ProcessInfo.processInfo.environment["TDS_REF_URL"] {
+        if let envRefTdsUrl = ProcessInfo.processInfo.environment["TDS_REF_URL"], !envRefTdsUrl.isEmpty {
             tdsRefURL = envRefTdsUrl
         }
     }

@@ -70,7 +70,7 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
             let refAverage = try runPerformanceTest(tds: refTDS, name: "Reference TDS")
             
             let percentDifference = (utAverage - refAverage) / refAverage
-            print("Percent difference: \(percentDifference * 100)%")
+            print("Percent difference: \(String(format: "%.2f", percentDifference * 100))%")
             
             XCTAssertLessThanOrEqual(percentDifference, maxPercentRegression, "UT TDS performance regression exceeds allowed threshold")
         }

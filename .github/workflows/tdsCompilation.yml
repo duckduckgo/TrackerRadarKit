@@ -29,23 +29,23 @@ jobs:
 
     - name: Run performance test (iOS)
       run: |
-        xcodebuild test-without-building \
-          -scheme TrackerRadarKit \
-          -destination 'platform=macOS' \
-          -only-testing:TrackerRadarKitPerformanceTests/NextTrackerDataSetPerformanceTests \
-          TDS_UT_FILE_NAME=tds-ios.json \
-          TDS_UT_URL=${{ inputs.ios_s3_url }} \
-          TDS_REF_FILE_NAME=tds-ios.json \
-          TDS_REF_URL=https://staticcdn.duckduckgo.com/trackerblocking/v5/current/
-
+        env TEST_RUNNER_TDS_UT_FILE_NAME=tds-ios.json \
+          TEST_RUNNER_TDS_UT_URL=${{ inputs.ios_s3_url }} \
+          TEST_RUNNER_TDS_REF_FILE_NAME=tds-ios.json \ 
+          TEST_RUNNER_TDS_REF_URL=https://staticcdn.duckduckgo.com/trackerblocking/v5/current/ \
+          xcodebuild test-without-building \
+            -scheme TrackerRadarKit \
+            -destination 'platform=macOS' \
+            -only-testing:TrackerRadarKitPerformanceTests/NextTrackerDataSetPerformanceTests 
+            
     - name: Run performance test (macOS)
       run: |
-        xcodebuild test-without-building \
-          -scheme TrackerRadarKit \
-          -destination 'platform=macOS' \
-          -only-testing:TrackerRadarKitPerformanceTests/NextTrackerDataSetPerformanceTests \
-          TDS_UT_FILE_NAME=tds-macos.json \
-          TDS_UT_URL=${{ inputs.macos_s3_url }} \
-          TDS_REF_FILE_NAME=tds-macos.json \
-          TDS_REF_URL=https://staticcdn.duckduckgo.com/trackerblocking/v6/current/
+        env TEST_RUNNER_TDS_UT_FILE_NAME=macos-tds.json \
+          TEST_RUNNER_TDS_UT_URL=${{ inputs.macos_s3_url }} \
+          TEST_RUNNER_TDS_REF_FILE_NAME=macos-tds.json \ 
+          TEST_RUNNER_TDS_REF_URL=https://staticcdn.duckduckgo.com/trackerblocking/v6/current/ \
+          xcodebuild test-without-building \
+            -scheme TrackerRadarKit \
+            -destination 'platform=macOS' \
+            -only-testing:TrackerRadarKitPerformanceTests/NextTrackerDataSetPerformanceTests 
 

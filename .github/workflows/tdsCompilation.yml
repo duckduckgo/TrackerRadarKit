@@ -31,7 +31,7 @@ jobs:
       run: |
         env TEST_RUNNER_TDS_UT_FILE_NAME=tds-ios.json \
             TEST_RUNNER_TDS_UT_URL=${{ inputs.ios_s3_url }} \
-            TEST_RUNNER_TDS_REF_FILE_NAME=tds-ios.json \ 
+            TEST_RUNNER_TDS_REF_FILE_NAME=tds-ios.json \
             TEST_RUNNER_TDS_REF_URL=https://staticcdn.duckduckgo.com/trackerblocking/v5/current/ \
             xcodebuild test-without-building \
               -scheme TrackerRadarKit \

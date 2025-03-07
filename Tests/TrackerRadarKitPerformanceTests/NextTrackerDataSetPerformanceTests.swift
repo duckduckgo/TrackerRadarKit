@@ -34,7 +34,7 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
     var tdsRefURL: String?
     
     let numberOfRuns = 10
-    let numberOfIterationsPerRun = 1
+    var numberOfIterationsPerRun: Int = 1 
     
     func nextURL(filename: String, fileURL: String) -> URL {
         let baseURL = URL(string: fileURL)!
@@ -46,12 +46,14 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         
         try loadParameters()
         
+        // Prepare TDS Under Test file
         let utTdsUrl = nextURL(filename: tdsUtFileName, fileURL: tdsUtURL)
         print("TDS under Test: \(utTdsUrl.absoluteString)")
         
         let (data, _) = try await URLSession.shared.data(from: utTdsUrl)
         utTDS = try JSONDecoder().decode(TrackerData.self, from: data)
         
+        // Prepare reference TDS file
         if let refFileName = tdsRefFileName, let refURL = tdsRefURL {
             let refTdsUrl = nextURL(filename: refFileName, fileURL: refURL)
             print("Reference TDS: \(refTdsUrl.absoluteString)")
@@ -154,6 +156,11 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         
         if let envRefTdsUrl = ProcessInfo.processInfo.environment["TDS_REF_URL"], !envRefTdsUrl.isEmpty {
             tdsRefURL = envRefTdsUrl
+        }
+        
+        if let envNumberOfIterations = ProcessInfo.processInfo.environment["NUMBER_OF_ITERATIONS_PER_RUN"], 
+            !envNumberOfIterations.isEmpty, let iterations = Int(envNumberOfIterations) {
+            numberOfIterationsPerRun = iterations
         }
     }
 }

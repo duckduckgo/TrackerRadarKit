@@ -79,7 +79,7 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         
         // Perform one last run inside measure block for XCTest metrics
         measure {
-            let _ = try? performSingleRun(tds: utTDS, run: numberOfRuns + 1, numberOfIterations: 1, name: "")
+            _ = try? performSingleRun(tds: utTDS, run: numberOfRuns + 1, numberOfIterations: 1, name: "")
         }
     }
         

@@ -76,16 +76,6 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
             
             XCTAssertLessThanOrEqual(percentDifference, maxPercentRegression, "UT TDS performance regression exceeds allowed threshold")
         }
-        
-        // Perform one last run inside measure block for XCTest metrics
-        let ruleList = try prepareRuleList(tds: utTDS)
-        
-        guard let store = WKContentRuleListStore(url: FileManager.default.temporaryDirectory) else {
-            throw NSError(domain: "PerformanceTestError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create WKContentRuleListStore"])
-        }
-        measure {
-            _ = measureSingleRun(store: store, ruleList: ruleList)
-        }
     }
         
     func runPerformanceTest(tds: TrackerData, name: String) throws -> TimeInterval {

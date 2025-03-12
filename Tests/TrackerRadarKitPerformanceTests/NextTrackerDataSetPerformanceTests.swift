@@ -78,17 +78,28 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         }
         
         // Perform one last run inside measure block for XCTest metrics
+        let ruleList = try prepareRuleList(tds: utTDS)
+        
+        guard let store = WKContentRuleListStore(url: FileManager.default.temporaryDirectory) else {
+            throw NSError(domain: "PerformanceTestError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create WKContentRuleListStore"])
+        }
         measure {
-            _ = try? performSingleRun(tds: utTDS, run: numberOfRuns + 1, numberOfIterations: 1, name: "")
+            _ = measureSingleRun(store: store, ruleList: ruleList)
         }
     }
         
     func runPerformanceTest(tds: TrackerData, name: String) throws -> TimeInterval {
         var allAverages: [TimeInterval] = []
         
+        let ruleList = try prepareRuleList(tds: tds)
+        
+        guard let store = WKContentRuleListStore(url: FileManager.default.temporaryDirectory) else {
+            throw NSError(domain: "PerformanceTestError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create WKContentRuleListStore"])
+        }
+        
         // Perform multiple runs outside of the measure block
         for run in 1...numberOfRuns {
-            let average = try performSingleRun(tds: tds, run: run, numberOfIterations: numberOfIterationsPerRun, name: name)
+            let average = try performSingleRun(store: store, ruleList: ruleList, run: run, numberOfIterations: numberOfIterationsPerRun, name: name)
             allAverages.append(average)
         }
         
@@ -99,31 +110,11 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         return finalAverage
     }
     
-    func performSingleRun(tds: TrackerData, run: Int, numberOfIterations: Int, name: String) throws -> TimeInterval {
-        let rules = ContentBlockerRulesBuilder(trackerData: tds).buildRules()
-        
-        let data = try JSONEncoder().encode(rules)
-        let ruleList = String(data: data, encoding: .utf8)!
-        
-        guard let store = WKContentRuleListStore(url: FileManager.default.temporaryDirectory) else {
-            throw NSError(domain: "PerformanceTestError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create WKContentRuleListStore"])
-        }
-        
+    func performSingleRun(store: WKContentRuleListStore, ruleList: String, run: Int, numberOfIterations: Int, name: String) throws -> TimeInterval {
         var totalTime: TimeInterval = 0
         
         for iteration in 1...numberOfIterations {
-            let time = CACurrentMediaTime()
-            let expectation = expectation(description: "Compiled")
-            
-            store.compileContentRuleList(forIdentifier: UUID().uuidString, encodedContentRuleList: ruleList) { _, error in
-                XCTAssertNil(error)
-                Thread.sleep(forTimeInterval: 1)
-                expectation.fulfill()
-            }
-            
-            wait(for: [expectation], timeout: 40)
-            
-            let executionTime = CACurrentMediaTime() - time
+            let executionTime = measureSingleRun(store: store, ruleList: ruleList)
             print("\(name) - Run \(run), Iteration \(iteration): Compiled in \(executionTime)")
             totalTime += executionTime
         }
@@ -132,7 +123,29 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         print("Run \(run) --> Average compilation time: \(average)")
         return average
     }
+    
+    func prepareRuleList(tds: TrackerData) throws -> String {
+        let rules = ContentBlockerRulesBuilder(trackerData: tds).buildRules()
         
+        let data = try JSONEncoder().encode(rules)
+        return String(data: data, encoding: .utf8)!
+    }
+    
+    func measureSingleRun(store: WKContentRuleListStore, ruleList: String) -> TimeInterval {
+        let time = CACurrentMediaTime()
+        let expectation = expectation(description: "Compiled")
+        
+        store.compileContentRuleList(forIdentifier: UUID().uuidString, encodedContentRuleList: ruleList) { _, error in
+            XCTAssertNil(error)
+            Thread.sleep(forTimeInterval: 1)
+            expectation.fulfill()
+        }
+        
+        wait(for: [expectation], timeout: 40)
+        
+        return CACurrentMediaTime() - time
+    }
+
     func calculateFinalAverage(_ allAverages: [TimeInterval]) -> TimeInterval {
         let sortedAverages = allAverages.sorted()
         let lowerIndex = Int(Double(sortedAverages.count) * 0.3)

@@ -62,7 +62,7 @@ jobs:
 
     - name: Run performance test (macOS)
       run: |
-        env TEST_RUNNER_TDS_UT_FILE_NAME=${{ inputs.ios_ref_url }} \
+        env TEST_RUNNER_TDS_UT_FILE_NAME=${{ inputs.macos_ut_file_name }} \
             TEST_RUNNER_TDS_UT_URL=${{ inputs.macos_s3_url }} \
             TEST_RUNNER_TDS_REF_FILE_NAME=${{ inputs.macos_ref_file_name }} \
             TEST_RUNNER_TDS_REF_URL=${{ inputs.macos_ref_url }} \

@@ -18,7 +18,7 @@
 
 import Foundation
 
-public struct ContentBlockerRulesBuilder {
+public struct ContentBlockerRulesBuilder: Sendable {
 
     struct Constants {
         // in the scheme .* overmatches and "OR" does not work

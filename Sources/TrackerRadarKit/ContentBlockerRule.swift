@@ -20,11 +20,11 @@ import Foundation
 import os
 
 // swiftlint:disable nesting
-public struct ContentBlockerRule: Codable, Hashable {
+public struct ContentBlockerRule: Sendable, Codable, Hashable {
 
-    public struct Trigger: Codable, Hashable {
+    public struct Trigger: Sendable, Codable, Hashable {
 
-        public enum ResourceType: String, Codable, CaseIterable {
+        public enum ResourceType: String, Sendable, Codable, CaseIterable {
 
             case document
             case image
@@ -38,14 +38,14 @@ public struct ContentBlockerRule: Codable, Hashable {
 
         }
         
-        public enum LoadType: String, Codable {
+        public enum LoadType: String, Sendable, Codable {
          
             case thirdParty = "third-party"
             case firstParty = "first-party"
             
         }
 
-        public enum LoadContext: String, Codable {
+        public enum LoadContext: String, Sendable, Codable {
             case topFrame = "top-frame"
             case childFrame = "child-frame"
         }
@@ -117,9 +117,9 @@ public struct ContentBlockerRule: Codable, Hashable {
         }
     }
 
-    public struct Action: Codable, Hashable {
+    public struct Action: Codable, Sendable, Hashable {
     
-        public enum ActionType: String, Codable {
+        public enum ActionType: String, Sendable, Codable {
             
             case block
             case ignorePreviousRules = "ignore-previous-rules"

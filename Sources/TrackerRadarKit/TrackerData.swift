@@ -18,13 +18,13 @@
 
 import Foundation
 
-public struct TrackerData: Codable, Equatable {
+public struct TrackerData: Sendable, Codable, Equatable {
 
     public typealias EntityName = String
     public typealias TrackerDomain = String
     public typealias CnameDomain = String
 
-    public struct TrackerRules {
+    public struct TrackerRules: Sendable {
         
         let tracker: KnownTracker
         
@@ -71,13 +71,13 @@ public struct TrackerData: Codable, Equatable {
     
 }
 
-public struct KnownTracker: Codable, Equatable {
+public struct KnownTracker: Sendable, Codable, Equatable {
 
     public static func == (lhs: KnownTracker, rhs: KnownTracker) -> Bool {
         return lhs.domain == rhs.domain
     }
 
-    public struct Owner: Codable {
+    public struct Owner: Sendable, Codable {
         
         public let name: String?
         public let displayName: String?
@@ -91,10 +91,10 @@ public struct KnownTracker: Codable, Equatable {
     
     }
     
-    public struct Rule: Codable, Hashable, Equatable {
+    public struct Rule: Sendable, Codable, Hashable, Equatable {
         
         // swiftlint:disable nesting
-        public struct Matching: Codable, Hashable {
+        public struct Matching: Sendable, Codable, Hashable {
 
             public let domains: [String]?
             public let types: [String]?
@@ -126,7 +126,7 @@ public struct KnownTracker: Codable, Equatable {
         }
     }
     
-    public enum ActionType: String, Codable {
+    public enum ActionType: String, Sendable, Codable {
         case block
         case ignore
         // blockCTLFB is treated as "block" for rule creation logic
@@ -208,7 +208,7 @@ extension KnownTracker {
     
 }
 
-public struct Entity: Codable, Hashable {
+public struct Entity: Sendable, Codable, Hashable {
 
     public let displayName: String?
     public let domains: [String]?
@@ -222,7 +222,7 @@ public struct Entity: Codable, Hashable {
     
 }
 
-private struct OptionalValue<Value: Decodable>: Decodable {
+private struct OptionalValue<Value: Decodable & Sendable>: Sendable, Decodable {
     public let value: Value?
 
     public init(from decoder: Decoder) throws {

@@ -18,9 +18,9 @@
 
 import Foundation
 
-public struct TrackerException {
+public struct TrackerException: Sendable {
 
-    public enum Matching {
+    public enum Matching: Sendable {
         case all
         case domains([String])
         case none

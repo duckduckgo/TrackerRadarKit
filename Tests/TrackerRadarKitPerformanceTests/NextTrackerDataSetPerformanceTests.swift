@@ -65,6 +65,7 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         print("TDS files prepared")
     }
     
+    @MainActor
     func testPerformanceOfNext_iOSTDS() throws {
         let utAverage = try runPerformanceTest(tds: utTDS, name: "UT TDS")
         
@@ -78,6 +79,7 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         }
     }
         
+    @MainActor
     func runPerformanceTest(tds: TrackerData, name: String) throws -> TimeInterval {
         var allAverages: [TimeInterval] = []
         
@@ -100,6 +102,7 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         return finalAverage
     }
     
+    @MainActor
     func performSingleRun(store: WKContentRuleListStore, ruleList: String, run: Int, numberOfIterations: Int, name: String) throws -> TimeInterval {
         var totalTime: TimeInterval = 0
         
@@ -121,6 +124,7 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         return String(data: data, encoding: .utf8)!
     }
     
+    @MainActor
     func measureSingleRun(store: WKContentRuleListStore, ruleList: String) -> TimeInterval {
         let time = CACurrentMediaTime()
         let expectation = expectation(description: "Compiled")
@@ -136,6 +140,7 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         return CACurrentMediaTime() - time
     }
 
+    @MainActor
     func calculateFinalAverage(_ allAverages: [TimeInterval]) -> TimeInterval {
         let sortedAverages = allAverages.sorted()
         let lowerIndex = Int(Double(sortedAverages.count) * 0.3)

@@ -24,13 +24,16 @@ let package = Package(
     products: [
         .library(
             name: "TrackerRadarKit",
-            targets: ["TrackerRadarKit"])
+            targets: ["TrackerRadarKit"]),
+        .executable(name: "trkcli", targets: ["CLI"])
     ],
     dependencies: [],
     targets: [
         .target(
             name: "TrackerRadarKit",
             dependencies: []),
+        .target(name: "CLI",
+                dependencies: ["TrackerRadarKit"]),
         .testTarget(
             name: "TrackerRadarKitTests",
             dependencies: ["TrackerRadarKit"],

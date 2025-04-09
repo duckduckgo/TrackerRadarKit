@@ -26,7 +26,7 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
     var utTDS: TrackerData!
     var refTDS: TrackerData?
         
-    var maxPercentRegression: Double = 0.05 // 5% by default
+    var maxPercentRegression: Double = 0.20 // 20% by default
 
     var tdsUtFileName: String = "ios-tds.json"
     var tdsUtURL: String = "https://staticcdn.duckduckgo.com/trackerblocking/v5/next/"

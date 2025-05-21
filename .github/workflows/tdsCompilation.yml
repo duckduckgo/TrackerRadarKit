@@ -16,11 +16,11 @@ on:
       ios_ref_file_name:
         description: 'iOS reference file name'
         required: false
-        default: 'ios-tds.json'
+        default: 'ref-ios-tds.json'
       ios_ref_url:
         description: 'iOS reference URL'
         required: false
-        default: 'https://staticcdn.duckduckgo.com/trackerblocking/v5/current/'
+        default: 'https://raw.githubusercontent.com/duckduckgo/TrackerRadarKit/refs/heads/main/use-static-reference-files/TestData/' 
       macos_ut_file_name:
         description: 'macOS UT file name'
         required: false
@@ -28,11 +28,11 @@ on:
       macos_ref_file_name:
         description: 'macOS reference file name'
         required: false
-        default: 'macos-tds.json'
+        default: 'ref-macos-tds.json'
       macos_ref_url:
         description: 'macOS reference URL'
         required: false
-        default: 'https://staticcdn.duckduckgo.com/trackerblocking/v6/current/'
+        default: 'https://raw.githubusercontent.com/duckduckgo/TrackerRadarKit/refs/heads/main/use-static-reference-files/TestData/' 
 
 jobs:
   performance-test:

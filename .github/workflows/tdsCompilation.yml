@@ -20,7 +20,7 @@ on:
       ios_ref_url:
         description: 'iOS reference URL'
         required: false
-        default: 'https://raw.githubusercontent.com/duckduckgo/TrackerRadarKit/refs/heads/main/use-static-reference-files/TestData/' 
+        default: 'https://raw.githubusercontent.com/duckduckgo/TrackerRadarKit/refs/heads/main/TestData/' 
       macos_ut_file_name:
         description: 'macOS UT file name'
         required: false
@@ -32,7 +32,7 @@ on:
       macos_ref_url:
         description: 'macOS reference URL'
         required: false
-        default: 'https://raw.githubusercontent.com/duckduckgo/TrackerRadarKit/refs/heads/main/use-static-reference-files/TestData/' 
+        default: 'https://raw.githubusercontent.com/duckduckgo/TrackerRadarKit/refs/heads/main/TestData/' 
 
 jobs:
   performance-test:

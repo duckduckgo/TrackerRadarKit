@@ -53,7 +53,6 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         andTemporaryUnprotectedDomains: [])
 
         // Optimized per WebKit recommendations: https://webkit.org/blog/4062/targeting-domains-with-content-blockers/
-        // swiftlint:disable:next line_length
         var domainFilter = "^[^:]+://+([^:/]+\\.)?xvideos-cdn\\.com\\/v-c19d94e7937\\/v3\\/js\\/skins\\/min\\/default\\.header\\.static\\.js"
         if let idx = rules.firstIndexOfExactFilter(filter: domainFilter) {
             let nextRule = rules[idx + 1]
@@ -96,7 +95,7 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         XCTAssertEqual(tracker.rules?.count, expectedNumberOfRules)
     }
 
-    func testTrackerDataParserPerformance () {
+    func testTrackerDataParserPerformance() {
         let data = JSONTestDataLoader.trackerData
         measure {
             _ = try? JSONDecoder().decode(TrackerData.self, from: data)

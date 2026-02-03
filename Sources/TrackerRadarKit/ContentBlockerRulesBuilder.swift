@@ -21,6 +21,7 @@ import Foundation
 public struct ContentBlockerRulesBuilder {
 
     struct Constants {
+        // Optimized per WebKit recommendations: https://webkit.org/blog/4062/targeting-domains-with-content-blockers/
         static let subDomainPrefix = "^[^:]+://+([^:/]+\\.)?"
         static let domainMatchSuffix = "[:/]"
     }

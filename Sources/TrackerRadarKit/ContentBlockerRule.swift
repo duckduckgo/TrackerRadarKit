@@ -51,7 +51,6 @@ public struct ContentBlockerRule: Codable, Hashable {
         }
 
         let urlFilter: String
-        let urlFilterIsCaseSensitive: Bool?
         let unlessDomain: [String]?
         let ifDomain: [String]?
         let resourceType: [ResourceType]?
@@ -60,7 +59,6 @@ public struct ContentBlockerRule: Codable, Hashable {
 
         enum CodingKeys: String, CodingKey {
             case urlFilter = "url-filter"
-            case urlFilterIsCaseSensitive = "url-filter-is-case-sensitive"
             case unlessDomain = "unless-domain"
             case ifDomain = "if-domain"
             case resourceType = "resource-type"
@@ -68,10 +66,9 @@ public struct ContentBlockerRule: Codable, Hashable {
             case loadContext = "load-context"
         }
 
-        private init(urlFilter: String, urlFilterIsCaseSensitive: Bool? = true, unlessDomain: [String]?, ifDomain: [String]?, 
+        private init(urlFilter: String, unlessDomain: [String]?, ifDomain: [String]?,
                      resourceType: [ResourceType]?, loadType: [LoadType]?, loadContext: [LoadContext]?) {
             self.urlFilter = urlFilter
-            self.urlFilterIsCaseSensitive = urlFilterIsCaseSensitive
             self.unlessDomain = unlessDomain
             self.ifDomain = ifDomain
             self.resourceType = resourceType

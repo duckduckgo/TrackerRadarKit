@@ -21,9 +21,9 @@ import Foundation
 public struct ContentBlockerRulesBuilder {
 
     struct Constants {
-        // in the scheme .* overmatches and "OR" does not work
-        static let subDomainPrefix = "^(https?)?(wss?)?://([a-z0-9-]+\\.)*"
-        static let domainMatchSuffix = "(:?[0-9]+)?/.*"
+        // Optimized per WebKit recommendations: https://webkit.org/blog/4062/targeting-domains-with-content-blockers/
+        static let subDomainPrefix = "^[^:]+://+([^:/]+\\.)?"
+        static let domainMatchSuffix = "[:/]"
     }
     
     public static let resourceMapping: [String: ContentBlockerRule.Trigger.ResourceType] = [

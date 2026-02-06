@@ -66,8 +66,12 @@ public struct ContentBlockerRule: Codable, Hashable {
             case loadContext = "load-context"
         }
 
-        private init(urlFilter: String, unlessDomain: [String]?, ifDomain: [String]?, 
-                     resourceType: [ResourceType]?, loadType: [LoadType]?, loadContext: [LoadContext]?) {
+        private init(urlFilter: String,
+                     unlessDomain: [String]?,
+                     ifDomain: [String]?,
+                     resourceType: [ResourceType]?,
+                     loadType: [LoadType]?,
+                     loadContext: [LoadContext]?) {
             self.urlFilter = urlFilter
             self.unlessDomain = unlessDomain
             self.ifDomain = ifDomain

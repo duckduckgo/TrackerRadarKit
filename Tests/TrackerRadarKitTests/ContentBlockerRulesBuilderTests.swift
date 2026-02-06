@@ -33,7 +33,8 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         andTemporaryUnprotectedDomains: [])
 
         // Test tracker is set up to be blocked
-        if let rule = rules.findExactFilter(filter: "^(https?)?(wss?)?://([a-z0-9-]+\\.)*googleadservices\\.com(:?[0-9]+)?/.*") {
+        // Optimized per WebKit recommendations: https://webkit.org/blog/4062/targeting-domains-with-content-blockers/
+        if let rule = rules.findExactFilter(filter: "^[^:]+://+([^:/]+\\.)?googleadservices\\.com[:/]") {
             XCTAssert(rule.action == .block())
         } else {
             XCTFail("Missing google ad services rule")
@@ -51,8 +52,8 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         let rules = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(withExceptions: ["duckduckgo.com"],
         andTemporaryUnprotectedDomains: [])
 
-        // swiftlint:disable:next line_length
-        var domainFilter = "^(https?)?(wss?)?://([a-z0-9-]+\\.)*xvideos-cdn\\.com\\/v-c19d94e7937\\/v3\\/js\\/skins\\/min\\/default\\.header\\.static\\.js"
+        // Optimized per WebKit recommendations: https://webkit.org/blog/4062/targeting-domains-with-content-blockers/
+        var domainFilter = "^[^:]+://+([^:/]+\\.)?xvideos-cdn\\.com\\/v-c19d94e7937\\/v3\\/js\\/skins\\/min\\/default\\.header\\.static\\.js"
         if let idx = rules.firstIndexOfExactFilter(filter: domainFilter) {
             let nextRule = rules[idx + 1]
             XCTAssertNotNil(nextRule, "Missing ignore-previous popup type rule")
@@ -64,7 +65,8 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         }
 
         // Test top level default block rule
-        domainFilter = "^(https?)?(wss?)?://([a-z0-9-]+\\.)*google-analytics\\.com(:?[0-9]+)?/.*"
+        // Optimized per WebKit recommendations
+        domainFilter = "^[^:]+://+([^:/]+\\.)?google-analytics\\.com[:/]"
         if let idx = rules.firstIndexOfExactFilter(filter: domainFilter) {
             let nextRule = rules[idx + 1]
             XCTAssertNotNil(nextRule, "Missing ignore-previous popup type rule")
@@ -93,7 +95,7 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         XCTAssertEqual(tracker.rules?.count, expectedNumberOfRules)
     }
 
-    func testTrackerDataParserPerformance () {
+    func testTrackerDataParserPerformance() {
         let data = JSONTestDataLoader.trackerData
         measure {
             _ = try? JSONDecoder().decode(TrackerData.self, from: data)

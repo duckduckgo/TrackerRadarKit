@@ -50,7 +50,7 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
         let utTdsUrl = nextURL(filename: tdsUtFileName, fileURL: tdsUtURL)
         print("TDS under Test: \(utTdsUrl.absoluteString)")
         
-        let (data, _) = try await URLSession.shared.data(from: utTdsUrl)
+        let (data, _) = try await fetchValidatedData(from: utTdsUrl)
         utTDS = try JSONDecoder().decode(TrackerData.self, from: data)
         
         // Prepare reference TDS file
@@ -58,11 +58,26 @@ class NextTrackerDataSetPerformanceTests: XCTestCase {
             let refTdsUrl = nextURL(filename: refFileName, fileURL: refURL)
             print("Reference TDS: \(refTdsUrl.absoluteString)")
             
-            let (refData, _) = try await URLSession.shared.data(from: refTdsUrl)
+            let (refData, _) = try await fetchValidatedData(from: refTdsUrl)
             refTDS = try JSONDecoder().decode(TrackerData.self, from: refData)
         }
         
         print("TDS files prepared")
+    }
+
+    /// Fetches data from a URL and validates that HTTP responses return 200.
+    /// Prevents opaque JSON decoding errors when a server returns an error page (e.g. 429 rate limit).
+    private func fetchValidatedData(from url: URL) async throws -> (Data, URLResponse) {
+        let (data, response) = try await URLSession.shared.data(from: url)
+        if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
+            let body = String(data: data.prefix(500), encoding: .utf8) ?? "<non-UTF-8 body>"
+            throw NSError(
+                domain: "TDSFetchError",
+                code: httpResponse.statusCode,
+                userInfo: [NSLocalizedDescriptionKey: "HTTP \(httpResponse.statusCode) from \(url.absoluteString): \(body)"]
+            )
+        }
+        return (data, response)
     }
     
     func testPerformanceOfNext_iOSTDS() throws {

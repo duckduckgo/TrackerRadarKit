@@ -36,7 +36,7 @@ on:
 
 jobs:
   performance-test:
-    runs-on: macos-15-xlarge
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v3
 

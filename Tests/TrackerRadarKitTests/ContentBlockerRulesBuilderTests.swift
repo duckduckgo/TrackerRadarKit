@@ -48,6 +48,35 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         }
     }
 
+    func testSurrogateRulesAreNotBlocked() throws {
+        let surrogateRule = KnownTracker.Rule(rule: "tracker\\.com\\/surrogate\\.js",
+                                              surrogate: "surrogate.js",
+                                              action: nil,
+                                              options: KnownTracker.Rule.Matching(domains: ["example.com"], types: nil),
+                                              exceptions: KnownTracker.Rule.Matching(domains: ["other.com"], types: nil))
+        let blockRule = KnownTracker.Rule(rule: "tracker\\.com\\/surrogate\\.js",
+                                          surrogate: nil, action: nil, options: nil, exceptions: nil)
+        let blockingTracker = KnownTracker(domain: "tracker.com", defaultAction: .block, owner: nil, prevalence: nil,
+                                           subdomains: nil, categories: nil, rules: [surrogateRule, blockRule])
+        let ignoringTracker = KnownTracker(domain: "ignored.com", defaultAction: .ignore, owner: nil, prevalence: nil,
+                                           subdomains: nil, categories: nil,
+                                           rules: [KnownTracker.Rule(rule: "ignored\\.com\\/surrogate\\.js", surrogate: "surrogate.js",
+                                                                     action: nil, options: nil, exceptions: nil)])
+        let trackerData = TrackerData(trackers: ["tracker.com": blockingTracker, "ignored.com": ignoringTracker],
+                                      entities: [:], domains: [:], cnames: nil)
+        let rules = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules()
+
+        // Blocking tracker: the surrogate rule becomes an unconditional ignore, after any rule that blocks the same URL
+        let filter = "^[^:]+://+([^:/]+\\.)?tracker\\.com\\/surrogate\\.js"
+        let matching = rules.filter { $0.trigger.urlFilter == filter }
+        XCTAssertEqual(matching.last?.action, .ignorePreviousRules())
+        XCTAssertNil(matching.last?.trigger.ifDomain)
+        XCTAssertNil(matching.last?.trigger.resourceType)
+
+        // Ignoring tracker: the surrogate rule produces no rules at all
+        XCTAssertFalse(rules.contains { $0.trigger.urlFilter.contains("ignored\\.com\\/surrogate") })
+    }
+
     func testDefaultIgnoreGeneratesPopupIgnoreRules() throws {
         let rules = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules(withExceptions: ["duckduckgo.com"],
         andTemporaryUnprotectedDomains: [])

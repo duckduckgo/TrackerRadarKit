@@ -77,16 +77,26 @@ public struct ContentBlockerRulesBuilder {
     public func buildRules(from tracker: KnownTracker, loadTypes: [ContentBlockerRule.Trigger.LoadType]) -> [ContentBlockerRule] {
         
         let blockingRules: [ContentBlockerRule] = buildBlockingRules(from: tracker, loadTypes: loadTypes)
-        
-        let specialRules = tracker.rules?.compactMap { r -> [ContentBlockerRule] in
+
+        // Surrogate rules are never blocked: surrogates are handled outside content blocking.
+        let rules = tracker.rules ?? []
+        let surrogateRules = rules.filter { $0.surrogate != nil }
+
+        let specialRules = rules.filter { $0.surrogate == nil }.compactMap { r -> [ContentBlockerRule] in
             buildRules(fromRule: r, inTracker: tracker, loadTypes: loadTypes)
-            } ?? []
-        
+            }
+
         let sortedRules = specialRules.sorted(by: { $0.count > $1.count })
-        
+
         let dedupedRules = sortedRules.flatMap { $0 }.removeDuplicates()
-        
-        return blockingRules + dedupedRules
+
+        // In a blocking tracker, a surrogate rule is treated as "ignore" (anywhere, regardless of options or exceptions).
+        // These go last so no other rule of this tracker can block the same URL again.
+        // In an ignoring tracker, nothing blocks the URL, so the rule is simply skipped.
+        let surrogateIgnoreRules = tracker.defaultAction == .block ?
+            surrogateRules.map { ignorePrevious($0, loadTypes: loadTypes) }.removeDuplicates() : []
+
+        return blockingRules + dedupedRules + surrogateIgnoreRules
     }
 
     static public func buildRule(trigger: ContentBlockerRule.Trigger, withAction action: ContentBlockerRule.Action) -> ContentBlockerRule {

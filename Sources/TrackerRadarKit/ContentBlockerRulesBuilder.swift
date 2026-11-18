@@ -35,9 +35,16 @@ public struct ContentBlockerRulesBuilder {
     ]
     
     let trackerData: TrackerData
+    let unblockSurrogateRules: Bool
 
-    public init(trackerData: TrackerData) {
+    /// - Parameters:
+    ///   - trackerData: The tracker data to build rules from.
+    ///   - unblockSurrogateRules: When `true`, requests matching a rule with a surrogate are never blocked, so that
+    ///     surrogates can be served outside content blocking (e.g. by a web extension's redirect rules).
+    ///     When `false` (the default), surrogate rules are blocked like any other rule.
+    public init(trackerData: TrackerData, unblockSurrogateRules: Bool = false) {
         self.trackerData = trackerData
+        self.unblockSurrogateRules = unblockSurrogateRules
     }
     
     /// Build all the rules for the given tracker data and list of exceptions.
@@ -78,11 +85,11 @@ public struct ContentBlockerRulesBuilder {
         
         let blockingRules: [ContentBlockerRule] = buildBlockingRules(from: tracker, loadTypes: loadTypes)
 
-        // Surrogate rules are never blocked: surrogates are handled outside content blocking.
         let rules = tracker.rules ?? []
-        let surrogateRules = rules.filter { $0.surrogate != nil }
+        let isUnblockedSurrogate = { (rule: KnownTracker.Rule) in unblockSurrogateRules && rule.surrogate != nil }
+        let surrogateRules = rules.filter(isUnblockedSurrogate)
 
-        let specialRules = rules.filter { $0.surrogate == nil }.compactMap { r -> [ContentBlockerRule] in
+        let specialRules = rules.filter { !isUnblockedSurrogate($0) }.compactMap { r -> [ContentBlockerRule] in
             buildRules(fromRule: r, inTracker: tracker, loadTypes: loadTypes)
             }
 
@@ -90,7 +97,7 @@ public struct ContentBlockerRulesBuilder {
 
         let dedupedRules = sortedRules.flatMap { $0 }.removeDuplicates()
 
-        // In a blocking tracker, a surrogate rule is treated as "ignore" (anywhere, regardless of options or exceptions).
+        // With unblockSurrogateRules, in a blocking tracker a surrogate rule is treated as "ignore" (anywhere, regardless of options or exceptions).
         // These go last so no other rule of this tracker can block the same URL again.
         // In an ignoring tracker, nothing blocks the URL, so the rule is simply skipped.
         let surrogateIgnoreRules = tracker.defaultAction == .block ?

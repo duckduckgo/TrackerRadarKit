@@ -48,7 +48,7 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
         }
     }
 
-    func testSurrogateRulesAreNotBlocked() throws {
+    private func surrogateTrackerData() -> TrackerData {
         let surrogateRule = KnownTracker.Rule(rule: "tracker\\.com\\/surrogate\\.js",
                                               surrogate: "surrogate.js",
                                               action: nil,
@@ -62,9 +62,12 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
                                            subdomains: nil, categories: nil,
                                            rules: [KnownTracker.Rule(rule: "ignored\\.com\\/surrogate\\.js", surrogate: "surrogate.js",
                                                                      action: nil, options: nil, exceptions: nil)])
-        let trackerData = TrackerData(trackers: ["tracker.com": blockingTracker, "ignored.com": ignoringTracker],
-                                      entities: [:], domains: [:], cnames: nil)
-        let rules = ContentBlockerRulesBuilder(trackerData: trackerData).buildRules()
+        return TrackerData(trackers: ["tracker.com": blockingTracker, "ignored.com": ignoringTracker],
+                           entities: [:], domains: [:], cnames: nil)
+    }
+
+    func testSurrogateRulesAreNotBlockedWhenUnblockSurrogateRulesIsSet() throws {
+        let rules = ContentBlockerRulesBuilder(trackerData: surrogateTrackerData(), unblockSurrogateRules: true).buildRules()
 
         // Blocking tracker: the surrogate rule becomes an unconditional ignore, after any rule that blocks the same URL
         let filter = "^[^:]+://+([^:/]+\\.)?tracker\\.com\\/surrogate\\.js"
@@ -75,6 +78,18 @@ class ContentBlockerRulesBuilderTests: XCTestCase {
 
         // Ignoring tracker: the surrogate rule produces no rules at all
         XCTAssertFalse(rules.contains { $0.trigger.urlFilter.contains("ignored\\.com\\/surrogate") })
+    }
+
+    func testSurrogateRulesAreBlockedByDefault() throws {
+        let rules = ContentBlockerRulesBuilder(trackerData: surrogateTrackerData()).buildRules()
+
+        // Blocking tracker: the last rule for the surrogate URL blocks it
+        let filter = "^[^:]+://+([^:/]+\\.)?tracker\\.com\\/surrogate\\.js"
+        let matching = rules.filter { $0.trigger.urlFilter == filter }
+        XCTAssertEqual(matching.last?.action, .block())
+
+        // Ignoring tracker: the surrogate rule blocks as a normal rule would
+        XCTAssertTrue(rules.contains { $0.trigger.urlFilter.contains("ignored\\.com\\/surrogate") && $0.action == .block() })
     }
 
     func testDefaultIgnoreGeneratesPopupIgnoreRules() throws {

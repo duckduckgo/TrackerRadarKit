@@ -84,25 +84,26 @@ public struct ContentBlockerRulesBuilder {
     public func buildRules(from tracker: KnownTracker, loadTypes: [ContentBlockerRule.Trigger.LoadType]) -> [ContentBlockerRule] {
         
         let blockingRules: [ContentBlockerRule] = buildBlockingRules(from: tracker, loadTypes: loadTypes)
-
-        let rules = tracker.rules ?? []
-        let isUnblockedSurrogate = { (rule: KnownTracker.Rule) in unblockSurrogateRules && rule.surrogate != nil }
-        let surrogateRules = rules.filter(isUnblockedSurrogate)
-
-        let specialRules = rules.filter { !isUnblockedSurrogate($0) }.compactMap { r -> [ContentBlockerRule] in
+        
+        var rules = tracker.rules ?? []
+        var surrogateIgnoreRules = [ContentBlockerRule]()
+        if unblockSurrogateRules {
+            // A surrogate rule becomes an unconditional "ignore", placed after the tracker's other rules so none of them
+            // can block the URL again. This applies to ignoring trackers too, as their other rules may block the URL.
+            surrogateIgnoreRules = rules.filter { $0.surrogate != nil }
+                .map { ignorePrevious($0, loadTypes: loadTypes) }
+                .removeDuplicates()
+            rules.removeAll { $0.surrogate != nil }
+        }
+        
+        let specialRules = rules.compactMap { r -> [ContentBlockerRule] in
             buildRules(fromRule: r, inTracker: tracker, loadTypes: loadTypes)
             }
-
+        
         let sortedRules = specialRules.sorted(by: { $0.count > $1.count })
-
+        
         let dedupedRules = sortedRules.flatMap { $0 }.removeDuplicates()
-
-        // With unblockSurrogateRules, in a blocking tracker a surrogate rule is treated as "ignore" (anywhere, regardless of options or exceptions).
-        // These go last so no other rule of this tracker can block the same URL again.
-        // In an ignoring tracker, nothing blocks the URL, so the rule is simply skipped.
-        let surrogateIgnoreRules = tracker.defaultAction == .block ?
-            surrogateRules.map { ignorePrevious($0, loadTypes: loadTypes) }.removeDuplicates() : []
-
+        
         return blockingRules + dedupedRules + surrogateIgnoreRules
     }
 

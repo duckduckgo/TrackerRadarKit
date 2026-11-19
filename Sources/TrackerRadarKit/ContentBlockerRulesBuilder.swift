@@ -35,9 +35,16 @@ public struct ContentBlockerRulesBuilder {
     ]
     
     let trackerData: TrackerData
+    let unblockSurrogateRules: Bool
 
-    public init(trackerData: TrackerData) {
+    /// - Parameters:
+    ///   - trackerData: The tracker data to build rules from.
+    ///   - unblockSurrogateRules: When `true`, requests matching a rule with a surrogate are never blocked, so that
+    ///     surrogates can be served outside content blocking (e.g. by a web extension's redirect rules).
+    ///     When `false` (the default), surrogate rules are blocked like any other rule.
+    public init(trackerData: TrackerData, unblockSurrogateRules: Bool = false) {
         self.trackerData = trackerData
+        self.unblockSurrogateRules = unblockSurrogateRules
     }
     
     /// Build all the rules for the given tracker data and list of exceptions.
@@ -78,15 +85,26 @@ public struct ContentBlockerRulesBuilder {
         
         let blockingRules: [ContentBlockerRule] = buildBlockingRules(from: tracker, loadTypes: loadTypes)
         
-        let specialRules = tracker.rules?.compactMap { r -> [ContentBlockerRule] in
+        var rules = tracker.rules ?? []
+        var surrogateIgnoreRules = [ContentBlockerRule]()
+        if unblockSurrogateRules {
+            // A surrogate rule becomes an unconditional "ignore", placed after the tracker's other rules so none of them
+            // can block the URL again. This applies to ignoring trackers too, as their other rules may block the URL.
+            surrogateIgnoreRules = rules.filter { $0.surrogate != nil }
+                .map { ignorePrevious($0, loadTypes: loadTypes) }
+                .removeDuplicates()
+            rules.removeAll { $0.surrogate != nil }
+        }
+        
+        let specialRules = rules.compactMap { r -> [ContentBlockerRule] in
             buildRules(fromRule: r, inTracker: tracker, loadTypes: loadTypes)
-            } ?? []
+            }
         
         let sortedRules = specialRules.sorted(by: { $0.count > $1.count })
         
         let dedupedRules = sortedRules.flatMap { $0 }.removeDuplicates()
         
-        return blockingRules + dedupedRules
+        return blockingRules + dedupedRules + surrogateIgnoreRules
     }
 
     static public func buildRule(trigger: ContentBlockerRule.Trigger, withAction action: ContentBlockerRule.Action) -> ContentBlockerRule {
